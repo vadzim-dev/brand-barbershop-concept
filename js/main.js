@@ -1,28 +1,29 @@
 const BOOKSY = 'https://booksy.com/pl-pl/67599_brand-barbershop_barber-shop_3_warszawa';
 const REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const TIERS = [
-  { id: 'barber', people: ['Roman', 'Andrzej'] },
-  { id: 'top', people: ['Darina', 'Karim'] },
-  { id: 'master', people: ['Zahar'] }
+const BARBERS = [
+  { id: 'any', tier: 'barber' },
+  { id: 'Roman', tier: 'barber' },
+  { id: 'Andrzej', tier: 'barber' },
+  { id: 'Darina', tier: 'top' },
+  { id: 'Karim', tier: 'top', photo: 'assets/karim.webp' },
+  { id: 'Zahar', tier: 'master' }
 ];
 
 const SERVICES = [
-  { id: 'cut', group: 'cut', price: { barber: 120, top: 140, master: 140 }, time: { barber: 45, top: 60, master: 60 } },
-  { id: 'combo', group: 'cut', price: { barber: 180, top: 200, master: 245 }, time: { barber: 75, top: 75, master: 60 } },
-  { id: 'beard', group: 'cut', price: { barber: 80, top: 100, master: 125 }, time: { barber: 30, top: 30, master: 30 } },
-  { id: 'clipper', group: 'cut', price: 100, time: 45 },
-  { id: 'clipperBeard', group: 'cut', price: 150, time: 60 },
-  { id: 'kid', group: 'cut', price: 100, time: 45 },
-  { id: 'fatherSon', group: 'cut', price: 190, time: 75 },
-  { id: 'greyHair', group: 'grey', price: 80, time: 30 },
-  { id: 'greyBeard', group: 'grey', price: 80, time: 30 },
-  { id: 'greyCombo', group: 'grey', price: 150, time: 45 },
-  { id: 'wash', group: 'extra', price: 50, time: 15 },
-  { id: 'wax', group: 'extra', price: 40, time: 15 }
+  { id: 'cut', main: true, price: { barber: 120, top: 140, master: 140 }, time: { barber: 45, top: 60, master: 60 } },
+  { id: 'combo', main: true, price: { barber: 180, top: 200, master: 245 }, time: { barber: 75, top: 75, master: 60 } },
+  { id: 'beard', main: true, price: { barber: 80, top: 100, master: 125 }, time: { barber: 30, top: 30, master: 30 } },
+  { id: 'clipper', main: true, price: 100, time: 45 },
+  { id: 'clipperBeard', price: 150, time: 60 },
+  { id: 'kid', price: 100, time: 45 },
+  { id: 'fatherSon', price: 190, time: 75 },
+  { id: 'greyHair', price: 80, time: 30 },
+  { id: 'greyBeard', price: 80, time: 30 },
+  { id: 'greyCombo', price: 150, time: 45 },
+  { id: 'wash', price: 50, time: 15 },
+  { id: 'wax', price: 40, time: 15 }
 ];
-
-const GROUPS = ['cut', 'grey', 'extra'];
 
 const MERGES = [
   { parts: ['cut', 'beard'], into: 'combo', key: 'hint.combo' },
@@ -39,20 +40,35 @@ const HOURS = [
   ['10:00', '20:00']
 ];
 
-const RATINGS = [
-  [5, 1065],
-  [4, 7],
-  [3, 6],
-  [2, 4],
-  [1, 4]
+const RATINGS = [[5, 1065], [4, 7], [3, 6], [2, 4], [1, 4]];
+
+const REVIEWS = [
+  { name: 'Adam', staff: 'Karim', text: 'Najlepszy barber, u jakiego byłem. Brodę zawsze strzyże bardzo dokładnie i zgodnie z tym, o co proszę.' },
+  { name: 'Petihko', staff: 'Andrzej', text: 'Byłem u Andrzeja i naprawdę super robota. Wszystko dokładnie, fajna atmosfera i widać, że zna się na rzeczy. Na pewno wrócę! 👌' },
+  { name: 'VOLODYMYR', staff: 'Zahar', text: 'Zakhar is a super barber! High quality haircut and friendly atmosphere. I recommend! 😉' },
+  { name: 'Anton', staff: 'Darina', text: 'Darina to świetna fryzjerka — profesjonalna, miła i zawsze dokładnie wie, czego potrzebuję, gorąco polecam!' },
+  { name: 'Ilya', staff: 'Roman', text: 'Dziękuję za wspaniałą atmosferę i punktualność Romana. Fryzura została wykonana na najwyższym poziomie, napewno wrócę tu jeszcze raz.' },
+  { name: 'Elchin', staff: 'Karim', text: 'As always, perfect service, amazing coffee and friendly atmosphere. Thanks Karim' },
+  { name: 'Michał', staff: 'Zahar', text: 'Chodzę do Zahara regularnie od wielu lat i nigdy się nie zawiodłem. Prawdziwy fachowiec. Serdecznie polecam' },
+  { name: 'Omar', staff: 'Andrzej', text: 'Andrzej is a great skilled barber, very sweet and kind guy too, surely coming back' },
+  { name: 'Can', staff: 'Darina', text: 'Najlepsi w Warszawie! Bardzo polecam, za każdym razem wychodzę zadowolony 🚀' },
+  { name: 'Grzegorz', staff: 'Karim', text: 'Jak zwykle świetna robota! Szybko, precyzyjnie i z klasą!' },
+  { name: 'Berat can', staff: 'Karim', text: 'Karim mükemmel bir berber herşeyi ile muhteşem' },
+  { name: 'Aleksander', staff: 'Zahar', text: 'Polecam Zahara w 100%. Bardzo dobry i dokładny barber. Pełna satysfakcja z wizyty gwarantowana' },
+  { name: 'Piotr', staff: 'Darina', text: 'Miła obsługa. Strzyżenie ładne i dokładne, co najważniejsze kawke dostałem. Cena adekwatna do jakości czyli sztosik' },
+  { name: 'Yehor', staff: 'Karim', text: 'Chodzę tutaj od lat i nigdy się nie zawiodłem. Polecam 10/10' },
+  { name: 'Szymon', staff: 'Andrzej', text: 'Polecam bardzo serdecznie, barber Andrzej najlepszy u jakiego byłem!! 😄 Napewno wrócę.' },
+  { name: 'Jeffery', staff: 'Zahar', text: 'Great haircut as always! Zakhar is the best. 🏆' }
 ];
 
 const state = {
   lang: 'pl',
-  tier: 'barber',
-  person: null,
+  barber: 'any',
   picked: new Set(),
-  shown: 0
+  shown: 0,
+  more: false,
+  quote: 0,
+  timer: null
 };
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -76,12 +92,16 @@ function store(key, value) {
   }
 }
 
-function priceOf(svc, tier = state.tier) {
-  return typeof svc.price === 'object' ? svc.price[tier] : svc.price;
+function tier() {
+  return BARBERS.find(b => b.id === state.barber).tier;
 }
 
-function timeOf(svc, tier = state.tier) {
-  return typeof svc.time === 'object' ? svc.time[tier] : svc.time;
+function priceOf(svc, tr = tier()) {
+  return typeof svc.price === 'object' ? svc.price[tr] : svc.price;
+}
+
+function timeOf(svc, tr = tier()) {
+  return typeof svc.time === 'object' ? svc.time[tr] : svc.time;
 }
 
 function byId(id) {
@@ -113,25 +133,43 @@ function toMin(str) {
   return h * 60 + m;
 }
 
-function tween(el, to, dur = 520) {
+function tween(to, dur = 520) {
+  const el = $('#billTotal');
+  const dock = $('#dockTotal');
   const from = state.shown;
   state.shown = to;
   if (REDUCE || from === to) {
     el.textContent = to;
-    $('#dockTotal').textContent = to;
+    dock.textContent = to;
     return;
   }
-  const start = performance.now();
   el.classList.remove('is-bump');
   void el.offsetWidth;
   el.classList.add('is-bump');
+  const start = performance.now();
   const step = now => {
     const p = Math.min((now - start) / dur, 1);
-    const e = 1 - Math.pow(1 - p, 3);
-    const v = Math.round(from + (to - from) * e);
+    const v = Math.round(from + (to - from) * (1 - Math.pow(1 - p, 3)));
     el.textContent = v;
-    $('#dockTotal').textContent = v;
+    dock.textContent = v;
     if (p < 1 && state.shown === to) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function countUp(el) {
+  const to = parseFloat(el.dataset.count);
+  const dec = +(el.dataset.decimals || 0);
+  if (REDUCE) {
+    el.textContent = to.toFixed(dec);
+    return;
+  }
+  const start = performance.now();
+  const dur = 1400;
+  const step = now => {
+    const p = Math.min((now - start) / dur, 1);
+    el.textContent = (to * (1 - Math.pow(1 - p, 4))).toFixed(dec);
+    if (p < 1) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
 }
@@ -155,60 +193,68 @@ function renderStatus() {
 }
 
 function renderTicker() {
-  const items = t('ticker');
-  const row = items.map(w => `<span>${w}</span><i aria-hidden="true"></i>`).join('');
+  const row = t('ticker').map(w => `<span>${w}</span><img src="assets/pole.svg" alt="">`).join('');
   $('#ticker').innerHTML = row + row;
 }
 
-function renderTiers() {
-  $('#tiers').innerHTML = TIERS.map(tier => `
-    <button class="tier${tier.id === state.tier ? ' is-active' : ''}" type="button" role="radio" aria-checked="${tier.id === state.tier}" data-tier="${tier.id}">
-      <b>${t('tier.' + tier.id)}</b>
-      <span>${tier.people.join(', ')}</span>
-    </button>`).join('');
-  const active = $('.tier.is-active');
-  $('#tiers').style.setProperty('--x', active ? active.offsetLeft + 'px' : 0);
-  $('#tiers').style.setProperty('--w', active ? active.offsetWidth + 'px' : 0);
+function avatar(b) {
+  if (b.photo) return `<span class="barber__ava"><img src="${b.photo}" alt=""></span>`;
+  if (b.id === 'any') return '<span class="barber__ava barber__ava--any"><img src="assets/scissors.svg" alt=""></span>';
+  return `<span class="barber__ava">${b.id[0]}</span>`;
+}
+
+function renderBarbers() {
+  $('#barbers').innerHTML = BARBERS.map(b => {
+    const on = b.id === state.barber;
+    const name = b.id === 'any' ? t('calc.any') : b.id;
+    const note = b.id === 'any' ? t('calc.anyNote') : t('calc.from', { p: priceOf(byId('cut'), b.tier) });
+    return `
+      <button class="barber${on ? ' is-on' : ''}" type="button" role="radio" aria-checked="${on}" data-barber="${b.id}">
+        ${avatar(b)}
+        <b>${name}</b>
+        <small>${note}</small>
+      </button>`;
+  }).join('');
+}
+
+function svcRow(svc) {
+  const on = state.picked.has(svc.id);
+  return `
+    <label class="svc${on ? ' is-on' : ''}">
+      <input type="checkbox" value="${svc.id}"${on ? ' checked' : ''}>
+      <span class="svc__box" aria-hidden="true"></span>
+      <span class="svc__text">
+        <b>${t('svc.' + svc.id)}</b>
+        <small>${t('svc.' + svc.id + '.d')} · ${fmtTime(timeOf(svc))}</small>
+      </span>
+      <b class="svc__price" data-svc="${svc.id}">${priceOf(svc)} zł</b>
+    </label>`;
 }
 
 function renderServices() {
-  $('#services').innerHTML = GROUPS.map(group => {
-    const list = SERVICES.filter(s => s.group === group);
-    return `
-      <fieldset class="group">
-        <legend>${t('group.' + group)}${group === 'cut' ? `<small>${t('group.tierNote')}</small>` : ''}</legend>
-        ${list.map(svc => {
-          const tiered = typeof svc.price === 'object';
-          const on = state.picked.has(svc.id);
-          return `
-          <label class="svc${on ? ' is-on' : ''}${tiered ? ' svc--tiered' : ''}">
-            <input type="checkbox" value="${svc.id}"${on ? ' checked' : ''}>
-            <span class="svc__box" aria-hidden="true"></span>
-            <span class="svc__text">
-              <b>${t('svc.' + svc.id)}</b>
-              <small>${t('svc.' + svc.id + '.d')}</small>
-            </span>
-            <span class="svc__meta">
-              <b class="svc__price" data-svc="${svc.id}">${priceOf(svc)} zł</b>
-              <small>${fmtTime(timeOf(svc))}</small>
-            </span>
-          </label>`;
-        }).join('')}
-      </fieldset>`;
-  }).join('');
+  $('#services').innerHTML = SERVICES.filter(s => s.main).map(svcRow).join('');
+  $('#servicesMore').innerHTML = SERVICES.filter(s => !s.main).map(svcRow).join('');
+  renderMoreBtn();
+}
+
+function renderMoreBtn() {
+  const btn = $('#moreBtn');
+  btn.setAttribute('aria-expanded', state.more);
+  $('span', btn).textContent = state.more ? t('calc.less') : t('calc.more');
+  $('#more').classList.toggle('is-open', state.more);
 }
 
 function refreshPrices() {
   $$('.svc__price').forEach(el => {
     const svc = byId(el.dataset.svc);
     const next = `${priceOf(svc)} zł`;
+    const small = el.previousElementSibling.querySelector('small');
+    small.textContent = `${t('svc.' + svc.id + '.d')} · ${fmtTime(timeOf(svc))}`;
     if (el.textContent === next) return;
     el.classList.remove('is-flip');
     void el.offsetWidth;
     el.textContent = next;
     el.classList.add('is-flip');
-    const time = el.nextElementSibling;
-    time.textContent = fmtTime(timeOf(svc));
   });
 }
 
@@ -220,24 +266,20 @@ function renderBill() {
   const items = SERVICES.filter(s => state.picked.has(s.id));
   const total = items.reduce((sum, s) => sum + priceOf(s), 0);
   const time = items.reduce((sum, s) => sum + timeOf(s), 0);
+  const b = BARBERS.find(x => x.id === state.barber);
 
+  $('#billWho').innerHTML = `${avatar(b)}<span>${b.id === 'any' ? t('sum.anyone') : b.id}</span>`;
   $('#billList').innerHTML = items.map(s => `
     <li>
       <span>${t('svc.' + s.id)}</span>
       <b>${priceOf(s)} zł</b>
-      <button type="button" class="bill__x" data-remove="${s.id}" aria-label="${t('sum.clear')}: ${t('svc.' + s.id)}">×</button>
+      <button type="button" class="bill__x" data-remove="${s.id}" aria-label="${t('sum.remove')}: ${t('svc.' + s.id)}">×</button>
     </li>`).join('');
 
   $('#billEmpty').hidden = items.length > 0;
-  $('#billClear').hidden = items.length === 0;
+  $('#billTime').textContent = items.length ? fmtTime(time) : '';
+  tween(total);
 
-  const tier = TIERS.find(x => x.id === state.tier);
-  $('#billBarber').textContent = state.person
-    ? `${state.person}, ${t('tier.' + tier.id)}`
-    : `${t('tier.' + tier.id)}: ${tier.people.join(' / ')}`;
-  $('#billTime').textContent = fmtTime(time);
-
-  tween($('#billTotal'), total);
   $('#dock').classList.toggle('is-shown', items.length > 0);
   $('#dock').setAttribute('aria-hidden', items.length ? 'false' : 'true');
   $('#dockBook').tabIndex = items.length ? 0 : -1;
@@ -245,46 +287,73 @@ function renderBill() {
   const merge = findMerge();
   const hint = $('#hint');
   if (merge) {
-    const parts = merge.parts.reduce((sum, id) => sum + priceOf(byId(id)), 0);
-    const save = parts - priceOf(byId(merge.into));
+    const save = merge.parts.reduce((sum, id) => sum + priceOf(byId(id)), 0) - priceOf(byId(merge.into));
     if (save > 0) {
       $('#hintText').textContent = t(merge.key, { x: save });
-      hint.hidden = false;
       hint.dataset.merge = merge.into;
+      hint.hidden = false;
       return;
     }
   }
   hint.hidden = true;
 }
 
-function renderTeam() {
-  const people = TIERS.flatMap(tier => tier.people.map(name => ({ name, tier: tier.id })));
-  $('#team').innerHTML = people.map(p => {
-    const on = state.person === p.name;
-    const from = priceOf(byId('cut'), p.tier);
-    return `
-      <li class="member member--${p.tier}${on ? ' is-on' : ''}">
-        <span class="member__letter" aria-hidden="true">${p.name[0]}</span>
-        <div class="member__body">
-          <b class="member__name">${p.name}</b>
-          <span class="member__tier">${t('tier.' + p.tier)}</span>
-          <span class="member__from">${t('team.from', { p: from })}</span>
-        </div>
-        <button class="btn btn--sm ${on ? 'btn--dark' : 'btn--ghost'}" type="button" data-person="${p.name}" data-tier="${p.tier}" aria-pressed="${on}">
-          ${on ? t('team.picked') : t('team.pick')}
-        </button>
-      </li>`;
-  }).join('');
-}
-
 function renderBars() {
-  const max = Math.max(...RATINGS.map(r => r[1]));
+  const max = RATINGS[0][1];
   $('#bars').innerHTML = RATINGS.map(([n, count]) => `
     <li>
-      <span class="bars__label">${n === 1 ? t('reviews.star') : t('reviews.stars', { n })}</span>
-      <span class="bars__track"><i style="--v:${Math.max(count / max, 0.006)}"></i></span>
+      <span>${n}★</span>
+      <span class="bars__track"><i style="--v:${Math.max(count / max, 0.008)}"></i></span>
       <b>${count}</b>
     </li>`).join('');
+}
+
+function renderQuotes() {
+  $('#quotes').innerHTML = REVIEWS.map((r, i) => `
+    <figure class="quote${i === state.quote ? ' is-on' : ''}" aria-hidden="${i !== state.quote}">
+      <span class="stars" aria-hidden="true">★★★★★</span>
+      <blockquote>${r.text}</blockquote>
+      <figcaption>
+        <span class="quote__ava">${r.name[0].toUpperCase()}</span>
+        <span><b>${r.name}</b><small>${t('reviews.at', { s: r.staff })} · Booksy</small></span>
+      </figcaption>
+    </figure>`).join('');
+  $('#quoteDots').innerHTML = `
+    <button type="button" class="quotes__arrow quotes__arrow--prev" data-step="-1" aria-label="${t('reviews.prev')}"></button>
+    <span class="quotes__count"><b id="quoteNum"></b> / ${String(REVIEWS.length).padStart(2, '0')}</span>
+    <button type="button" class="quotes__arrow" data-step="1" aria-label="${t('reviews.next')}"></button>
+    <span class="quotes__bar" id="quoteBar"></span>`;
+  showQuote(state.quote);
+}
+
+function showQuote(i) {
+  state.quote = (i + REVIEWS.length) % REVIEWS.length;
+  $$('.quote').forEach((q, n) => {
+    q.classList.toggle('is-on', n === state.quote);
+    q.setAttribute('aria-hidden', n !== state.quote);
+  });
+  $('#quoteNum').textContent = String(state.quote + 1).padStart(2, '0');
+  restartBar();
+}
+
+function restartBar() {
+  const bar = $('#quoteBar');
+  bar.classList.remove('is-run');
+  void bar.offsetWidth;
+  bar.classList.add('is-run');
+}
+
+function startQuotes() {
+  stopQuotes();
+  if (REDUCE) return;
+  state.timer = setInterval(() => showQuote(state.quote + 1), 5500);
+  $('#quoteDots').classList.remove('is-paused');
+  restartBar();
+}
+
+function stopQuotes() {
+  clearInterval(state.timer);
+  $('#quoteDots').classList.add('is-paused');
 }
 
 function renderHours() {
@@ -308,40 +377,47 @@ function applyStatic() {
   $$('[data-i18n-aria]').forEach(el => {
     el.setAttribute('aria-label', t(el.dataset.i18nAria));
   });
-  $$('.langs button').forEach(b => {
-    b.setAttribute('aria-pressed', b.dataset.lang === state.lang);
-  });
+  $$('.langs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === state.lang));
+  const open = $('#founderBtn').getAttribute('aria-expanded') === 'true';
+  $('.founder__btnText').textContent = open ? t('founder.close') : t('founder.open');
 }
 
 function renderAll() {
   applyStatic();
   renderStatus();
   renderTicker();
-  renderTiers();
+  renderBarbers();
   renderServices();
   renderBill();
-  renderTeam();
   renderBars();
+  renderQuotes();
   renderHours();
 }
 
-function setTier(tier, person = null) {
-  const changed = tier !== state.tier;
-  state.tier = tier;
-  state.person = person;
-  renderTiers();
-  if (changed) refreshPrices();
+function setBarber(id) {
+  if (id === state.barber) return;
+  const before = tier();
+  state.barber = id;
+  $$('.barber').forEach(b => {
+    const on = b.dataset.barber === id;
+    b.classList.toggle('is-on', on);
+    b.setAttribute('aria-checked', on);
+  });
+  if (before !== tier()) refreshPrices();
   renderBill();
-  renderTeam();
 }
 
 function toggleService(id, on) {
   if (on) state.picked.add(id);
   else state.picked.delete(id);
-  const label = $(`.svc input[value="${id}"]`)?.closest('.svc');
-  if (label) {
-    label.classList.toggle('is-on', on);
-    label.querySelector('input').checked = on;
+  const input = $(`.svc input[value="${id}"]`);
+  if (input) {
+    input.checked = on;
+    input.closest('.svc').classList.toggle('is-on', on);
+  }
+  if (on && !byId(id).main && !state.more) {
+    state.more = true;
+    renderMoreBtn();
   }
   renderBill();
 }
@@ -355,21 +431,26 @@ function bindEvents() {
     renderAll();
   });
 
-  $('#tiers').addEventListener('click', e => {
-    const btn = e.target.closest('.tier');
-    if (btn) setTier(btn.dataset.tier);
+  $('#barbers').addEventListener('click', e => {
+    const btn = e.target.closest('.barber');
+    if (btn) setBarber(btn.dataset.barber);
   });
 
-  $('#tiers').addEventListener('keydown', e => {
+  $('#barbers').addEventListener('keydown', e => {
     if (!['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
-    const i = TIERS.findIndex(x => x.id === state.tier);
-    const next = TIERS[(i + (e.key === 'ArrowRight' ? 1 : TIERS.length - 1)) % TIERS.length];
-    setTier(next.id);
-    $(`.tier[data-tier="${next.id}"]`).focus();
+    const i = BARBERS.findIndex(b => b.id === state.barber);
+    const next = BARBERS[(i + (e.key === 'ArrowRight' ? 1 : BARBERS.length - 1)) % BARBERS.length];
+    setBarber(next.id);
+    $(`.barber[data-barber="${next.id}"]`).focus();
   });
 
-  $('#services').addEventListener('change', e => {
-    if (e.target.matches('input[type="checkbox"]')) toggleService(e.target.value, e.target.checked);
+  $('.calc__main').addEventListener('change', e => {
+    if (e.target.matches('.svc input')) toggleService(e.target.value, e.target.checked);
+  });
+
+  $('#moreBtn').addEventListener('click', () => {
+    state.more = !state.more;
+    renderMoreBtn();
   });
 
   $('#billList').addEventListener('click', e => {
@@ -377,28 +458,39 @@ function bindEvents() {
     if (btn) toggleService(btn.dataset.remove, false);
   });
 
-  $('#billClear').addEventListener('click', () => {
-    [...state.picked].forEach(id => toggleService(id, false));
-  });
-
   $('#hintBtn').addEventListener('click', () => {
-    const into = $('#hint').dataset.merge;
-    const merge = MERGES.find(m => m.into === into);
+    const merge = MERGES.find(m => m.into === $('#hint').dataset.merge);
     if (!merge) return;
     merge.parts.forEach(id => toggleService(id, false));
-    toggleService(into, true);
+    toggleService(merge.into, true);
   });
 
-  $('#team').addEventListener('click', e => {
-    const btn = e.target.closest('[data-person]');
-    if (!btn) return;
-    const same = state.person === btn.dataset.person;
-    setTier(btn.dataset.tier, same ? null : btn.dataset.person);
-    if (!same && !state.picked.size) toggleService('cut', true);
-    if (!same) {
-      $('#cennik').scrollIntoView({ behavior: REDUCE ? 'auto' : 'smooth' });
-    }
+  $('#founderBtn').addEventListener('click', () => {
+    const btn = $('#founderBtn');
+    const open = btn.getAttribute('aria-expanded') !== 'true';
+    btn.setAttribute('aria-expanded', open);
+    $('#zalozyciel').classList.toggle('is-open', open);
+    $('.founder__btnText').textContent = open ? t('founder.close') : t('founder.open');
   });
+
+  $('#founderBook').addEventListener('click', () => {
+    setBarber('Karim');
+    if (!state.picked.size) toggleService('cut', true);
+    $('#cennik').scrollIntoView({ behavior: REDUCE ? 'auto' : 'smooth' });
+  });
+
+  $('#quoteDots').addEventListener('click', e => {
+    const btn = e.target.closest('[data-step]');
+    if (!btn) return;
+    showQuote(state.quote + +btn.dataset.step);
+    startQuotes();
+  });
+
+  const stage = $('.quotes');
+  stage.addEventListener('mouseenter', stopQuotes);
+  stage.addEventListener('mouseleave', startQuotes);
+  stage.addEventListener('focusin', stopQuotes);
+  stage.addEventListener('focusout', startQuotes);
 
   const burger = $('#burger');
   burger.addEventListener('click', () => {
@@ -408,40 +500,64 @@ function bindEvents() {
   });
 
   $('#nav').addEventListener('click', e => {
-    if (e.target.closest('a')) {
-      burger.setAttribute('aria-expanded', 'false');
-      document.body.classList.remove('menu-open');
-    }
+    if (!e.target.closest('a')) return;
+    burger.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('menu-open');
   });
+}
 
-  window.addEventListener('resize', () => {
-    const active = $('.tier.is-active');
-    if (!active) return;
-    $('#tiers').style.setProperty('--x', active.offsetLeft + 'px');
-    $('#tiers').style.setProperty('--w', active.offsetWidth + 'px');
-  });
+function bindScroll() {
+  const bar = $('#topbar');
+  const progress = $('#progress');
+  const cut = $('.cut');
+  const scissors = $('.cut__scissors');
+  let ticking = false;
+
+  const update = () => {
+    ticking = false;
+    const y = window.scrollY;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.classList.toggle('is-scrolled', y > 8);
+    progress.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
+
+    const r = cut.getBoundingClientRect();
+    const p = Math.min(Math.max((innerHeight - r.top) / (innerHeight + r.height), 0), 1);
+    const eased = Math.min(Math.max((p - 0.15) / 0.6, 0), 1);
+    cut.style.setProperty('--p', eased);
+    scissors.style.setProperty('--snip', Math.sin(p * 40) * 9 + 'deg');
+  };
 
   window.addEventListener('scroll', () => {
-    $('#topbar').classList.toggle('is-scrolled', window.scrollY > 8);
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
   }, { passive: true });
+  update();
 }
 
 function bindReveal() {
-  const targets = $$('.section__head, .group, .bill, .member, .about__media, .about__text, .reviews__score, .reviews__bars, .visit__info, .visit__map');
+  const targets = $$('.section__head, .step, .bill, .about__media, .about__text, .reviews__score, .quotes, .visit__info, .visit__map, .founder__photo, .founder__text');
   targets.forEach(el => el.classList.add('reveal'));
+  const counters = $$('[data-count]');
+
   if (REDUCE || !('IntersectionObserver' in window)) {
     targets.forEach(el => el.classList.add('is-in'));
     $('#opinie').classList.add('is-in');
     return;
   }
+
   const io = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
       entry.target.classList.add('is-in');
+      if (entry.target.dataset.count) countUp(entry.target);
       io.unobserve(entry.target);
     });
   }, { rootMargin: '0px 0px -10% 0px' });
+
   targets.forEach(el => io.observe(el));
+  counters.forEach(el => io.observe(el));
   io.observe($('#opinie'));
 }
 
@@ -456,7 +572,9 @@ function init() {
 
   renderAll();
   bindEvents();
+  bindScroll();
   bindReveal();
+  startQuotes();
   setInterval(renderStatus, 60000);
   requestAnimationFrame(() => document.body.classList.add('is-ready'));
 }

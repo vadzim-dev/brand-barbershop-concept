@@ -11,24 +11,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://images.unsplash.com">
-  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Familjen+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Familjen+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <a class="skip" href="#main" data-i18n="ui.skip">Przejdź do treści</a>
-  <div class="pole" aria-hidden="true"></div>
+  <div class="pole" aria-hidden="true"><i id="progress"></i></div>
 
   <header class="topbar" id="topbar">
     <div class="topbar__inner">
       <a class="logo" href="#top" aria-label="BRAND Barbershop">
-        <svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true"><rect x="2" y="2" width="36" height="36" rx="9"/><path d="M13 10h9.5a5.5 5.5 0 0 1 2.4 10.4A6 6 0 0 1 22.8 31H13Z"/><path d="M17.5 14.2v5.2h4.6a2.6 2.6 0 0 0 0-5.2Zm0 9v4h5.2a2 2 0 0 0 0-4Z"/></svg>
-        <span>BRAND</span>
+        <img src="assets/wordmark.svg" alt="" width="120" height="37">
       </a>
 
       <nav class="nav" id="nav" aria-label="Menu">
         <a href="#cennik" data-i18n="nav.prices">Cennik</a>
-        <a href="#zespol" data-i18n="nav.team">Zespół</a>
-        <a href="#o-nas" data-i18n="nav.about">O nas</a>
+        <a href="#zalozyciel" data-i18n="nav.founder">Założyciel</a>
         <a href="#opinie" data-i18n="nav.reviews">Opinie</a>
         <a href="#kontakt" data-i18n="nav.visit">Dojazd</a>
       </nav>
@@ -38,7 +36,6 @@
           <button type="button" data-lang="pl">PL</button>
           <button type="button" data-lang="en">EN</button>
           <button type="button" data-lang="ru">RU</button>
-          <button type="button" data-lang="tr">TR</button>
         </div>
         <a class="btn btn--dark btn--sm topbar__book" href="#cennik" data-i18n="ui.book">Umów wizytę</a>
         <button class="burger" id="burger" type="button" aria-controls="nav" aria-expanded="false" aria-label="Menu">
@@ -53,19 +50,19 @@
       <div class="hero__text">
         <p class="status" id="status"><i></i><span></span></p>
         <h1 class="hero__title" data-i18n="hero.title">Strzyżenie, po&nbsp;które się wraca.</h1>
-        <p class="hero__lead" data-i18n="hero.lead">Barbershop w&nbsp;samym Śródmieściu. Strzyżemy, trymujemy brody i&nbsp;dobieramy kosmetyki do&nbsp;domu. Po&nbsp;polsku, angielsku, rosyjsku i&nbsp;turecku.</p>
+        <p class="hero__lead" data-i18n="hero.lead">Barbershop w&nbsp;samym Śródmieściu. Strzyżemy, trymujemy brody i&nbsp;dobieramy kosmetyki do&nbsp;domu.</p>
         <div class="hero__cta">
-          <a class="btn btn--accent" href="#cennik" data-i18n="hero.calc">Policz wizytę</a>
+          <a class="btn btn--accent" href="#cennik" data-i18n="hero.calc">Sprawdź ceny</a>
           <a class="btn btn--ghost" id="heroBooksy" href="#" target="_blank" rel="noopener" data-i18n="ui.booksy">Rezerwuj na Booksy</a>
         </div>
         <dl class="hero__facts">
           <div class="fact">
-            <dt><b class="fact__big" data-count="5.0">5.0</b></dt>
-            <dd><span class="stars" aria-hidden="true">★★★★★</span><span data-i18n="hero.rating">1086 opinii na Booksy</span></dd>
+            <dt><b class="fact__big" data-count="5" data-decimals="1">5.0</b></dt>
+            <dd><span class="stars" aria-hidden="true">★★★★★</span><span data-i18n="hero.rating">ocena na Booksy</span></dd>
           </div>
           <div class="fact">
-            <dt><b class="fact__big">55</b></dt>
-            <dd data-i18n="hero.addr">Al. Jerozolimskie, Warszawa</dd>
+            <dt><b class="fact__big" data-count="1086">1086</b></dt>
+            <dd data-i18n="hero.reviews">opinii klientów</dd>
           </div>
         </dl>
       </div>
@@ -75,9 +72,9 @@
         <svg class="stamp" viewBox="0 0 200 200" aria-hidden="true">
           <defs><path id="ring" d="M100 100m-74 0a74 74 0 1 1 148 0a74 74 0 1 1-148 0"/></defs>
           <circle cx="100" cy="100" r="96"/>
-          <text><textPath href="#ring" textLength="462">BRAND BARBERSHOP · WARSZAWA · ŚRÓDMIEŚCIE ·</textPath></text>
-          <path class="stamp__b" d="M84 66h21a12 12 0 0 1 5.3 22.8A13 13 0 0 1 105.5 134H84Zm10 9.5v11.2h10a5.6 5.6 0 0 0 0-11.2Zm0 19.6v9.4h11.4a4.7 4.7 0 0 0 0-9.4Z"/>
+          <text><textPath href="#ring" textLength="462">BRAND BARBER SHOP ★ WARSZAWA ★ ŚRÓDMIEŚCIE ★</textPath></text>
         </svg>
+        <img class="stamp__icon" src="assets/scissors.svg" alt="" aria-hidden="true">
       </figure>
     </section>
 
@@ -87,77 +84,135 @@
 
     <section class="section calc" id="cennik">
       <div class="section__head">
-        <h2 class="h2" data-i18n="calc.title">Cennik i&nbsp;kalkulator wizyty</h2>
-        <p class="section__lead" data-i18n="calc.lead">Wybierz poziom barbera i&nbsp;usługi. Cena i&nbsp;czas policzą się same, a&nbsp;termin zarezerwujesz na&nbsp;Booksy.</p>
+        <h2 class="h2"><img class="h2__icon" src="assets/scissors.svg" alt=""><span data-i18n="calc.title">Cennik</span></h2>
+        <p class="section__lead" data-i18n="calc.lead">Wybierz barbera i&nbsp;usługi, a&nbsp;od razu zobaczysz cenę i&nbsp;czas wizyty.</p>
       </div>
 
       <div class="calc__grid">
         <div class="calc__main">
-          <div class="tiers" id="tiers" role="radiogroup" data-i18n-aria="calc.tierAria" aria-label="Poziom barbera"></div>
-          <div class="services" id="services"></div>
+          <div class="step">
+            <h3 class="step__title"><b>1</b><span data-i18n="calc.step1">Wybierz barbera</span></h3>
+            <div class="barbers" id="barbers" role="radiogroup" data-i18n-aria="calc.step1"></div>
+          </div>
+
+          <div class="step">
+            <h3 class="step__title"><b>2</b><span data-i18n="calc.step2">Wybierz usługi</span></h3>
+            <div class="services" id="services"></div>
+            <div class="more" id="more">
+              <div class="more__inner">
+                <div class="services" id="servicesMore"></div>
+              </div>
+            </div>
+            <button class="more__btn" id="moreBtn" type="button" aria-expanded="false" aria-controls="more">
+              <span data-i18n="calc.more">Pokaż więcej usług</span>
+              <i aria-hidden="true"></i>
+            </button>
+          </div>
         </div>
 
         <aside class="bill" id="bill" aria-live="polite">
-          <div class="bill__top">
-            <h3 data-i18n="sum.title">Twoja wizyta</h3>
-            <button class="bill__clear" id="billClear" type="button" data-i18n="sum.clear">Wyczyść</button>
-          </div>
+          <h3 class="bill__title" data-i18n="sum.title">Twoja wizyta</h3>
+          <div class="bill__who" id="billWho"></div>
           <ul class="bill__list" id="billList"></ul>
-          <p class="bill__empty" id="billEmpty" data-i18n="sum.empty">Wybierz usługę z&nbsp;listy obok.</p>
+          <p class="bill__empty" id="billEmpty" data-i18n="sum.empty">Zaznacz usługę, a&nbsp;tutaj pojawi się cena.</p>
           <div class="hint" id="hint" hidden>
             <p id="hintText"></p>
-            <button class="btn btn--sm btn--dark" id="hintBtn" type="button" data-i18n="hint.switch">Zamień</button>
+            <button class="btn btn--sm" id="hintBtn" type="button" data-i18n="hint.switch">Zamień na COMBO</button>
           </div>
-          <dl class="bill__meta">
-            <div><dt data-i18n="sum.barber">Barber</dt><dd id="billBarber"></dd></div>
-            <div><dt data-i18n="sum.time">Czas</dt><dd id="billTime">0 min</dd></div>
-          </dl>
           <div class="bill__total">
-            <span data-i18n="sum.total">Razem</span>
+            <div>
+              <span data-i18n="sum.total">Razem</span>
+              <small id="billTime"></small>
+            </div>
             <b><span id="billTotal">0</span> zł</b>
           </div>
           <a class="btn btn--accent btn--block" id="billBook" href="#" target="_blank" rel="noopener" data-i18n="ui.booksy">Rezerwuj na Booksy</a>
-          <p class="bill__note" data-i18n="sum.note">Ceny według cennika salonu na&nbsp;Booksy. Aktualne promocje widać przy rezerwacji.</p>
+          <p class="bill__note" data-i18n="sum.note">Ceny z&nbsp;cennika salonu na&nbsp;Booksy. Termin wybierasz przy rezerwacji.</p>
         </aside>
       </div>
     </section>
 
-    <section class="section team" id="zespol">
-      <div class="section__head">
-        <h2 class="h2" data-i18n="team.title">Zespół</h2>
-        <p class="section__lead" data-i18n="team.lead">Pięcioro barberów i&nbsp;trzy poziomy. Wybierz osobę, a&nbsp;kalkulator od razu pokaże jej ceny.</p>
+    <div class="cut" aria-hidden="true">
+      <span class="cut__line"></span>
+      <img class="cut__scissors" src="assets/scissors.svg" alt="">
+    </div>
+
+    <section class="founder" id="zalozyciel">
+      <div class="founder__inner">
+        <figure class="founder__photo">
+          <span class="founder__pole" aria-hidden="true"></span>
+          <img src="assets/karim.webp" alt="Karim, założyciel BRAND Barbershop" width="560" height="652" loading="lazy">
+          <figcaption>
+            <img src="assets/wordmark.svg" alt="" aria-hidden="true">
+          </figcaption>
+        </figure>
+
+        <div class="founder__text">
+          <p class="founder__kicker" data-i18n="founder.kicker">Poznaj założyciela</p>
+          <h2 class="founder__name">Karim</h2>
+          <p class="founder__role" data-i18n="founder.role">Założyciel sieci BRAND Barbershop</p>
+          <p class="founder__lead" data-i18n="founder.lead">Pasjonat kultury barberskiej i&nbsp;mistrz w&nbsp;swoim fachu. To on stworzył BRAND i&nbsp;do dziś sam staje za fotelem.</p>
+
+          <button class="founder__btn" id="founderBtn" type="button" aria-expanded="false" aria-controls="founderMore">
+            <span class="founder__btnText" data-i18n="founder.open">Poznaj historię Karima</span>
+            <span class="founder__plus" aria-hidden="true"></span>
+          </button>
+
+          <div class="founder__more" id="founderMore">
+            <div class="founder__moreInner">
+              <p data-i18n="founder.p1">Karim ma szeroką wiedzę i&nbsp;doświadczenie w&nbsp;strzyżeniu męskim oraz pielęgnacji brody. Jest też mentorem i&nbsp;nauczycielem nowych barberów sieci BRAND, więc każdy w&nbsp;zespole pracuje według jego standardów.</p>
+              <ul class="founder__tags">
+                <li data-i18n="founder.t1">Strzyżenie męskie</li>
+                <li data-i18n="founder.t2">Pielęgnacja brody</li>
+                <li data-i18n="founder.t3">Mentor zespołu</li>
+              </ul>
+              <div class="founder__quote">
+                <img src="assets/pole.svg" alt="" aria-hidden="true">
+                <p data-i18n="founder.reviews">Klienci w&nbsp;opiniach piszą o&nbsp;nim najczęściej: „Najlepszy barber, u&nbsp;jakiego byłem”.</p>
+              </div>
+              <button class="btn btn--accent" id="founderBook" type="button" data-i18n="founder.book">Policz wizytę u&nbsp;Karima</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <ul class="team__list" id="team"></ul>
     </section>
 
     <section class="section about" id="o-nas">
       <div class="about__media">
-        <img class="about__img about__img--a" src="https://images.unsplash.com/photo-1592647420148-bfcc177e2117?w=900&q=80&auto=format&fit=crop" alt="" data-i18n-alt="about.altChair" loading="lazy" width="900" height="1100">
+        <img class="about__img about__img--a" src="https://images.unsplash.com/photo-1593702275687-f8b402bf1fb5?w=900&q=80&auto=format&fit=crop" alt="" data-i18n-alt="about.altCut" loading="lazy" width="900" height="1100">
         <img class="about__img about__img--b" src="https://images.unsplash.com/photo-1517832606299-7ae9b720a186?w=700&q=80&auto=format&fit=crop" alt="" data-i18n-alt="about.altBeard" loading="lazy" width="700" height="800">
+        <span class="spin-pole about__pole" aria-hidden="true"><i></i><img src="assets/pole.svg" alt=""></span>
       </div>
       <div class="about__text">
         <h2 class="h2" data-i18n="about.title">Strzyżenie to dopiero połowa</h2>
-        <p data-i18n="about.p1">Perfekcyjne strzyżenie, trymowanie i&nbsp;stylizację brody łączymy z&nbsp;chwilą odpoczynku. Pracujemy na&nbsp;profesjonalnych kosmetykach najwyższej jakości.</p>
-        <p data-i18n="about.p2">Po&nbsp;wizycie pomagamy dobrać preparaty do&nbsp;pielęgnacji włosów i&nbsp;brody w&nbsp;domu, żeby efekt trzymał się do&nbsp;następnego razu.</p>
+        <p data-i18n="about.p1">Perfekcyjne strzyżenie i&nbsp;stylizację brody łączymy z&nbsp;chwilą odpoczynku. Pracujemy na&nbsp;profesjonalnych kosmetykach najwyższej jakości.</p>
         <ul class="perks">
           <li><b data-i18n="about.k1">Mycie i&nbsp;modelowanie w&nbsp;cenie</b><span data-i18n="about.k1s">Przy każdym strzyżeniu włosów.</span></li>
           <li><b data-i18n="about.k2">Odsiwianie American Crew</b><span data-i18n="about.k2s">Kolor dobieramy do&nbsp;Twoich włosów.</span></li>
           <li><b data-i18n="about.k3">Ojciec i&nbsp;syn</b><span data-i18n="about.k3s">Wspólna wizyta dla dzieci od&nbsp;3 do&nbsp;10 lat.</span></li>
-          <li><b data-i18n="about.k4">Karty podarunkowe</b><span data-i18n="about.k4s">I&nbsp;pakiety usług, kupisz je na&nbsp;Booksy.</span></li>
+          <li><b data-i18n="about.k4">Mówimy w&nbsp;4 językach</b><span data-i18n="about.k4s">Polski, angielski, rosyjski i&nbsp;turecki.</span></li>
         </ul>
       </div>
     </section>
 
-    <section class="section reviews" id="opinie">
-      <div class="reviews__score">
-        <b class="reviews__big" id="scoreBig">5.0</b>
-        <span class="stars stars--lg" aria-hidden="true">★★★★★</span>
-        <p data-i18n="reviews.count">1086 opinii od&nbsp;potwierdzonych klientów Booksy</p>
-      </div>
-      <div class="reviews__bars">
-        <h2 class="h2" data-i18n="reviews.title">Klienci wracają. I&nbsp;to widać w&nbsp;liczbach.</h2>
-        <ul class="bars" id="bars"></ul>
-        <a class="link-arrow" id="reviewsLink" href="#" target="_blank" rel="noopener" data-i18n="reviews.link">Czytaj wszystkie opinie na Booksy</a>
+    <section class="reviews" id="opinie">
+      <div class="reviews__inner">
+        <div class="reviews__score">
+          <b class="reviews__big" data-count="5" data-decimals="1">5.0</b>
+          <span class="stars stars--lg" aria-hidden="true">★★★★★</span>
+          <p data-i18n="reviews.count">1086 opinii od&nbsp;potwierdzonych klientów Booksy</p>
+          <ul class="bars" id="bars"></ul>
+        </div>
+
+        <div class="quotes">
+          <h2 class="h2" data-i18n="reviews.title">Co piszą klienci</h2>
+          <div class="quotes__stage" id="quotes" aria-live="polite"></div>
+          <div class="quotes__nav">
+            <div class="quotes__dots" id="quoteDots"></div>
+            <a class="link-arrow" id="reviewsLink" href="#" target="_blank" rel="noopener" data-i18n="reviews.link">Wszystkie opinie na Booksy</a>
+          </div>
+          <p class="quotes__note" data-i18n="reviews.note">Prawdziwe opinie z&nbsp;Booksy, w&nbsp;oryginalnym języku.</p>
+        </div>
       </div>
     </section>
 
@@ -184,14 +239,11 @@
 
   <footer class="footer">
     <div class="footer__inner">
-      <a class="logo logo--light" href="#top" aria-label="BRAND Barbershop">
-        <svg viewBox="0 0 40 40" width="30" height="30" aria-hidden="true"><rect x="2" y="2" width="36" height="36" rx="9"/><path d="M13 10h9.5a5.5 5.5 0 0 1 2.4 10.4A6 6 0 0 1 22.8 31H13Z"/><path d="M17.5 14.2v5.2h4.6a2.6 2.6 0 0 0 0-5.2Zm0 9v4h5.2a2 2 0 0 0 0-4Z"/></svg>
-        <span>BRAND</span>
-      </a>
+      <img class="footer__logo" src="assets/wordmark.svg" alt="BRAND Barber Shop" width="150" height="46">
       <p class="footer__concept" data-i18n="footer.concept">Koncepcja strony przygotowana dla BRAND Barbershop. To nie jest oficjalna strona salonu, rezerwacje przyjmuje Booksy.</p>
       <p class="footer__credits">
         <span><span data-i18n="footer.made">Projekt i kod:</span> <a href="https://github.com/vadzim-dev" target="_blank" rel="noopener">Vadzim</a></span>
-        <span><span data-i18n="footer.photos">Zdjęcia:</span> <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a></span>
+        <span><span data-i18n="footer.photos">Zdjęcia:</span> <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>, BRAND Barbershop</span>
       </p>
     </div>
   </footer>
