@@ -13,8 +13,16 @@
   <link rel="preconnect" href="https://images.unsplash.com">
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Familjen+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script>try{if(localStorage.getItem('brand.theme')==='dark')document.documentElement.dataset.theme='dark'}catch(e){}</script>
 </head>
 <body>
+  <div class="intro" id="intro" aria-hidden="true">
+    <div class="intro__in">
+      <img src="assets/wordmark.svg" alt="">
+      <span class="intro__line"></span>
+    </div>
+  </div>
+  <div class="cursor" aria-hidden="true"><i class="cursor__dot"></i><i class="cursor__ring"></i></div>
   <a class="skip" href="#main" data-i18n="ui.skip">Przejdź do treści</a>
   <div class="pole" aria-hidden="true"><i id="progress"></i></div>
 
@@ -38,6 +46,10 @@
           <button type="button" data-lang="ru">RU</button>
         </div>
         <a class="btn btn--dark btn--sm topbar__book" href="#cennik" data-i18n="ui.book">Umów wizytę</a>
+        <button class="theme" id="themeBtn" type="button" data-i18n-aria="ui.theme" aria-label="Zmień motyw">
+          <svg class="theme__sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+          <svg class="theme__moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6Z"/></svg>
+        </button>
         <button class="burger" id="burger" type="button" aria-controls="nav" aria-expanded="false" aria-label="Menu">
           <span></span><span></span>
         </button>
@@ -138,6 +150,23 @@
       <span class="cut__knob"></span>
     </div>
 
+
+    <section class="section about" id="o-nas">
+      <div class="about__media">
+        <img class="about__img about__img--a" src="https://images.unsplash.com/photo-1648221122323-572c13a31663?w=1000&q=85&auto=format&fit=crop" alt="" data-i18n-alt="about.altCut" loading="lazy" width="900" height="1100">
+        <img class="about__img about__img--b" src="https://images.unsplash.com/photo-1517832606299-7ae9b720a186?w=700&q=80&auto=format&fit=crop" alt="" data-i18n-alt="about.altBeard" loading="lazy" width="700" height="800">
+      </div>
+      <div class="about__text">
+        <h2 class="h2" data-i18n="about.title">Strzyżenie to dopiero połowa</h2>
+        <p data-i18n="about.p1">Perfekcyjne strzyżenie i&nbsp;stylizację brody łączymy z&nbsp;chwilą odpoczynku. Pracujemy na&nbsp;profesjonalnych kosmetykach najwyższej jakości.</p>
+        <ul class="perks">
+          <li><b data-i18n="about.k1">Mycie i&nbsp;modelowanie w&nbsp;cenie</b><span data-i18n="about.k1s">Przy każdym strzyżeniu włosów.</span></li>
+          <li><b data-i18n="about.k2">Odsiwianie American Crew</b><span data-i18n="about.k2s">Kolor dobieramy do&nbsp;Twoich włosów.</span></li>
+          <li><b data-i18n="about.k3">Ojciec i&nbsp;syn</b><span data-i18n="about.k3s">Wspólna wizyta dla dzieci od&nbsp;3 do&nbsp;10 lat.</span></li>
+          <li><b data-i18n="about.k4">Mówimy w&nbsp;4 językach</b><span data-i18n="about.k4s">Polski, angielski, rosyjski i&nbsp;turecki.</span></li>
+        </ul>
+      </div>
+    </section>
     <section class="founder" id="zalozyciel">
       <button class="founder__btn" id="founderBtn" type="button" aria-expanded="false" aria-controls="founderPanel">
         <span class="founder__label">
@@ -159,23 +188,6 @@
             </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <section class="section about" id="o-nas">
-      <div class="about__media">
-        <img class="about__img about__img--a" src="https://images.unsplash.com/photo-1593702275687-f8b402bf1fb5?w=900&q=80&auto=format&fit=crop" alt="" data-i18n-alt="about.altCut" loading="lazy" width="900" height="1100">
-        <img class="about__img about__img--b" src="https://images.unsplash.com/photo-1517832606299-7ae9b720a186?w=700&q=80&auto=format&fit=crop" alt="" data-i18n-alt="about.altBeard" loading="lazy" width="700" height="800">
-      </div>
-      <div class="about__text">
-        <h2 class="h2" data-i18n="about.title">Strzyżenie to dopiero połowa</h2>
-        <p data-i18n="about.p1">Perfekcyjne strzyżenie i&nbsp;stylizację brody łączymy z&nbsp;chwilą odpoczynku. Pracujemy na&nbsp;profesjonalnych kosmetykach najwyższej jakości.</p>
-        <ul class="perks">
-          <li><b data-i18n="about.k1">Mycie i&nbsp;modelowanie w&nbsp;cenie</b><span data-i18n="about.k1s">Przy każdym strzyżeniu włosów.</span></li>
-          <li><b data-i18n="about.k2">Odsiwianie American Crew</b><span data-i18n="about.k2s">Kolor dobieramy do&nbsp;Twoich włosów.</span></li>
-          <li><b data-i18n="about.k3">Ojciec i&nbsp;syn</b><span data-i18n="about.k3s">Wspólna wizyta dla dzieci od&nbsp;3 do&nbsp;10 lat.</span></li>
-          <li><b data-i18n="about.k4">Mówimy w&nbsp;4 językach</b><span data-i18n="about.k4s">Polski, angielski, rosyjski i&nbsp;turecki.</span></li>
-        </ul>
       </div>
     </section>
 
