@@ -1,6 +1,7 @@
 const I18N = {
   pl: {
     'ui.skip': 'Przejdź do treści',
+    'ui.theme': 'Zmień motyw',
     'ui.book': 'Umów wizytę',
     'ui.booksy': 'Rezerwuj na Booksy',
     'nav.prices': 'Cennik',
@@ -97,6 +98,7 @@ const I18N = {
 
   en: {
     'ui.skip': 'Skip to content',
+    'ui.theme': 'Switch theme',
     'ui.book': 'Book a visit',
     'ui.booksy': 'Book on Booksy',
     'nav.prices': 'Prices',
@@ -193,6 +195,7 @@ const I18N = {
 
   ru: {
     'ui.skip': 'Перейти к содержимому',
+    'ui.theme': 'Сменить тему',
     'ui.book': 'Записаться',
     'ui.booksy': 'Записаться в Booksy',
     'nav.prices': 'Цены',

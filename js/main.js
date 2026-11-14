@@ -380,8 +380,15 @@ function applyStatic() {
   $$('.langs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === state.lang));
 }
 
+function splitTitle() {
+  const title = $('.hero__title');
+  const words = title.textContent.trim().split(/ +/);
+  title.innerHTML = words.map((w, i) => `<span class="w"><span style="--i:${i}">${w}</span></span>`).join(' ');
+}
+
 function renderAll() {
   applyStatic();
+  splitTitle();
   renderStatus();
   renderTicker();
   renderBarbers();
@@ -564,6 +571,138 @@ function bindReveal() {
   io.observe($('#opinie'));
 }
 
+function setTheme(dark) {
+  const root = document.documentElement;
+  if (dark) root.dataset.theme = 'dark';
+  else delete root.dataset.theme;
+  $('meta[name="theme-color"]').content = dark ? '#0b0c0f' : '#15161a';
+  store('brand.theme', dark ? 'dark' : 'light');
+}
+
+function bindTheme() {
+  const btn = $('#themeBtn');
+  btn.addEventListener('click', () => {
+    const dark = document.documentElement.dataset.theme !== 'dark';
+    if (REDUCE || !document.startViewTransition) {
+      setTheme(dark);
+      return;
+    }
+    const r = btn.getBoundingClientRect();
+    const x = r.left + r.width / 2;
+    const y = r.top + r.height / 2;
+    const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    const tr = document.startViewTransition(() => setTheme(dark));
+    tr.ready.then(() => {
+      document.documentElement.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
+        { duration: 750, easing: 'cubic-bezier(.65, 0, .35, 1)', pseudoElement: '::view-transition-new(root)' }
+      );
+    });
+  });
+}
+
+function runIntro(done) {
+  const intro = $('#intro');
+  let seen = false;
+  try { seen = sessionStorage.getItem('brand.intro') === '1'; } catch (e) {}
+  if (REDUCE || seen) {
+    intro.remove();
+    done();
+    return;
+  }
+  try { sessionStorage.setItem('brand.intro', '1'); } catch (e) {}
+  document.body.classList.add('is-intro');
+  requestAnimationFrame(() => intro.classList.add('is-on'));
+  setTimeout(() => {
+    intro.classList.add('is-out');
+    document.body.classList.remove('is-intro');
+    done();
+  }, 1250);
+  setTimeout(() => intro.remove(), 2300);
+}
+
+function bindCursor() {
+  if (REDUCE || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const box = $('.cursor');
+  const dot = $('.cursor__dot');
+  const ring = $('.cursor__ring');
+  document.documentElement.classList.add('has-cursor');
+  let x = -100, y = -100, rx = -100, ry = -100;
+  const hot = 'a, button, label, .svc, .barber, iframe';
+
+  window.addEventListener('pointermove', e => {
+    x = e.clientX;
+    y = e.clientY;
+    box.classList.add('is-on');
+    box.classList.toggle('is-hot', !!e.target.closest(hot));
+  }, { passive: true });
+  document.addEventListener('pointerleave', () => box.classList.remove('is-on'));
+  window.addEventListener('pointerdown', () => box.classList.add('is-down'));
+  window.addEventListener('pointerup', () => box.classList.remove('is-down'));
+
+  const loop = () => {
+    rx += (x - rx) * 0.18;
+    ry += (y - ry) * 0.18;
+    dot.style.transform = `translate(${x}px, ${y}px)`;
+    ring.style.transform = `translate(${rx}px, ${ry}px)`;
+    requestAnimationFrame(loop);
+  };
+  loop();
+}
+
+function bindFx() {
+  if (REDUCE || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  $$('.btn, .theme, .founder__plus').forEach(el => {
+    el.addEventListener('pointermove', e => {
+      const r = el.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width / 2);
+      const dy = e.clientY - (r.top + r.height / 2);
+      el.style.translate = `${dx * 0.22}px ${dy * 0.32}px`;
+    });
+    el.addEventListener('pointerleave', () => { el.style.translate = ''; });
+  });
+
+  document.addEventListener('pointermove', e => {
+    const card = e.target.closest('.svc, .barber, .perks li, .quote, .bill');
+    if (!card) return;
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--sx', e.clientX - r.left + 'px');
+    card.style.setProperty('--sy', e.clientY - r.top + 'px');
+  }, { passive: true });
+
+  const hero = $('.hero');
+  const media = $('.hero__media');
+  hero.addEventListener('pointermove', e => {
+    const r = media.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    media.style.transform = `perspective(1100px) rotateY(${px * 7}deg) rotateX(${-py * 7}deg)`;
+  });
+  hero.addEventListener('pointerleave', () => { media.style.transform = ''; });
+}
+
+function bindParallax() {
+  if (REDUCE) return;
+  const items = [[$('.about__img--b'), -0.12], [$('.about__img--a'), 0.05]];
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    items.forEach(([el, k]) => {
+      const r = el.getBoundingClientRect();
+      const mid = r.top + r.height / 2 - innerHeight / 2;
+      el.style.translate = `0 ${(mid * k).toFixed(1)}px`;
+    });
+  };
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  }, { passive: true });
+  update();
+}
+
 function init() {
   const saved = store('brand.lang');
   const nav = (navigator.language || 'pl').slice(0, 2);
@@ -578,8 +717,12 @@ function init() {
   bindScroll();
   bindReveal();
   startQuotes();
+  bindTheme();
+  bindCursor();
+  bindFx();
+  bindParallax();
   setInterval(renderStatus, 60000);
-  requestAnimationFrame(() => document.body.classList.add('is-ready'));
+  runIntro(() => requestAnimationFrame(() => document.body.classList.add('is-ready')));
 }
 
 init();
