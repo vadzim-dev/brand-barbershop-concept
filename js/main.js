@@ -621,34 +621,6 @@ function runIntro(done) {
   setTimeout(() => intro.remove(), 2300);
 }
 
-function bindCursor() {
-  if (REDUCE || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-  const box = $('.cursor');
-  const dot = $('.cursor__dot');
-  const ring = $('.cursor__ring');
-  document.documentElement.classList.add('has-cursor');
-  let x = -100, y = -100, rx = -100, ry = -100;
-  const hot = 'a, button, label, .svc, .barber, iframe';
-
-  window.addEventListener('pointermove', e => {
-    x = e.clientX;
-    y = e.clientY;
-    box.classList.add('is-on');
-    box.classList.toggle('is-hot', !!e.target.closest(hot));
-  }, { passive: true });
-  document.addEventListener('pointerleave', () => box.classList.remove('is-on'));
-  window.addEventListener('pointerdown', () => box.classList.add('is-down'));
-  window.addEventListener('pointerup', () => box.classList.remove('is-down'));
-
-  const loop = () => {
-    rx += (x - rx) * 0.18;
-    ry += (y - ry) * 0.18;
-    dot.style.transform = `translate(${x}px, ${y}px)`;
-    ring.style.transform = `translate(${rx}px, ${ry}px)`;
-    requestAnimationFrame(loop);
-  };
-  loop();
-}
 
 function bindFx() {
   if (REDUCE || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
@@ -718,7 +690,6 @@ function init() {
   bindReveal();
   startQuotes();
   bindTheme();
-  bindCursor();
   bindFx();
   bindParallax();
   setInterval(renderStatus, 60000);
