@@ -7,14 +7,13 @@ This is not the salon's official website; bookings stay on Booksy.
 
 ## What's inside
 
-- Price calculator in two steps: pick a barber, tick services, see the total and time
-- Hint when two services are cheaper as a COMBO
-- Founder section with an expandable story
-- Rotating real 5-star reviews from Booksy
-- Live "open now" status in Warsaw time and today's hours highlighted
-- Scroll details: progress bar, scissors divider, animated barber poles, count-up numbers
+- Mobile-first, minimal layout
+- Price calculator: pick a barber, tick services, see the total and time
+- Hint when two services are cheaper together
+- Real 5-star reviews from Booksy, swipeable
+- Live "open now" status in Warsaw time and opening hours
+- Founder card that opens from a button
 - Three languages: Polish, English, Russian
-- Responsive layout with a sticky booking bar on mobile, respects reduced motion
 
 ## Stack
 
