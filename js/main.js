@@ -193,13 +193,13 @@ function renderStatus() {
 }
 
 function renderTicker() {
-  const row = t('ticker').map(w => `<span>${w}</span><img src="assets/pole.svg" alt="">`).join('');
+  const row = t('ticker').map(w => `<span>${w}</span><i class="ticker__dot"></i>`).join('');
   $('#ticker').innerHTML = row + row;
 }
 
 function avatar(b) {
   if (b.photo) return `<span class="barber__ava"><img src="${b.photo}" alt=""></span>`;
-  if (b.id === 'any') return '<span class="barber__ava barber__ava--any"><img src="assets/scissors.svg" alt=""></span>';
+  if (b.id === 'any') return '<span class="barber__ava barber__ava--any">★</span>';
   return `<span class="barber__ava">${b.id[0]}</span>`;
 }
 
@@ -515,7 +515,6 @@ function bindScroll() {
   const bar = $('#topbar');
   const progress = $('#progress');
   const cut = $('.cut');
-  const scissors = $('.cut__scissors');
   let ticking = false;
 
   const update = () => {
@@ -529,7 +528,6 @@ function bindScroll() {
     const p = Math.min(Math.max((innerHeight - r.top) / (innerHeight + r.height), 0), 1);
     const eased = Math.min(Math.max((p - 0.15) / 0.6, 0), 1);
     cut.style.setProperty('--p', eased);
-    scissors.style.setProperty('--snip', Math.sin(p * 40) * 9 + 'deg');
   };
 
   window.addEventListener('scroll', () => {
