@@ -69,12 +69,13 @@
 
       <figure class="hero__media">
         <img src="https://images.unsplash.com/photo-1647140655214-e4a2d914971f?w=1100&q=80&auto=format&fit=crop" alt="" data-i18n-alt="hero.alt" width="1100" height="1375" fetchpriority="high">
-        <svg class="stamp" viewBox="0 0 200 200" aria-hidden="true">
-          <defs><path id="ring" d="M100 100m-74 0a74 74 0 1 1 148 0a74 74 0 1 1-148 0"/></defs>
-          <circle cx="100" cy="100" r="96"/>
-          <text><textPath href="#ring" textLength="462">BRAND BARBER SHOP ★ WARSZAWA ★ ŚRÓDMIEŚCIE ★</textPath></text>
-        </svg>
-        <img class="stamp__icon" src="assets/scissors.svg" alt="" aria-hidden="true">
+        <div class="stamp" aria-hidden="true">
+          <svg class="stamp__ring" viewBox="0 0 200 200">
+            <defs><path id="ring" d="M100 100m-74 0a74 74 0 1 1 148 0a74 74 0 1 1-148 0"/></defs>
+            <text><textPath href="#ring" textLength="462">BRAND BARBER SHOP ★ WARSZAWA ★ ŚRÓDMIEŚCIE ★</textPath></text>
+          </svg>
+          <span class="stamp__core"><img src="assets/wordmark.svg" alt=""></span>
+        </div>
       </figure>
     </section>
 
@@ -84,7 +85,7 @@
 
     <section class="section calc" id="cennik">
       <div class="section__head">
-        <h2 class="h2"><img class="h2__icon" src="assets/scissors.svg" alt=""><span data-i18n="calc.title">Cennik</span></h2>
+        <h2 class="h2"><span data-i18n="calc.title">Cennik</span></h2>
         <p class="section__lead" data-i18n="calc.lead">Wybierz barbera i&nbsp;usługi, a&nbsp;od razu zobaczysz cenę i&nbsp;czas wizyty.</p>
       </div>
 
@@ -134,7 +135,7 @@
 
     <div class="cut" aria-hidden="true">
       <span class="cut__line"></span>
-      <img class="cut__scissors" src="assets/scissors.svg" alt="">
+      <span class="cut__knob"></span>
     </div>
 
     <section class="founder" id="zalozyciel">
@@ -165,7 +166,6 @@
       <div class="about__media">
         <img class="about__img about__img--a" src="https://images.unsplash.com/photo-1593702275687-f8b402bf1fb5?w=900&q=80&auto=format&fit=crop" alt="" data-i18n-alt="about.altCut" loading="lazy" width="900" height="1100">
         <img class="about__img about__img--b" src="https://images.unsplash.com/photo-1517832606299-7ae9b720a186?w=700&q=80&auto=format&fit=crop" alt="" data-i18n-alt="about.altBeard" loading="lazy" width="700" height="800">
-        <span class="spin-pole about__pole" aria-hidden="true"><i></i><img src="assets/pole.svg" alt=""></span>
       </div>
       <div class="about__text">
         <h2 class="h2" data-i18n="about.title">Strzyżenie to dopiero połowa</h2>
