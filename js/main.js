@@ -512,7 +512,6 @@ function bindEvents() {
 function bindScroll() {
   const bar = $('#topbar');
   const progress = $('#progress');
-  const cut = $('.cut');
   let ticking = false;
 
   const update = () => {
@@ -521,11 +520,6 @@ function bindScroll() {
     const max = document.documentElement.scrollHeight - innerHeight;
     bar.classList.toggle('is-scrolled', y > 8);
     progress.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
-
-    const r = cut.getBoundingClientRect();
-    const p = Math.min(Math.max((innerHeight - r.top) / (innerHeight + r.height), 0), 1);
-    const eased = Math.min(Math.max((p - 0.15) / 0.6, 0), 1);
-    cut.style.setProperty('--p', eased);
   };
 
   window.addEventListener('scroll', () => {
@@ -538,7 +532,7 @@ function bindScroll() {
 }
 
 function bindReveal() {
-  const targets = $$('.section__head, .step, .bill, .about__media, .about__text, .reviews__score, .quotes, .visit__info, .visit__map, .founder');
+  const targets = $$('.cut, .section__head, .step, .bill, .about__media, .about__text, .reviews__score, .quotes, .visit__info, .visit__map, .founder');
   targets.forEach(el => el.classList.add('reveal'));
 
   if (REDUCE || !('IntersectionObserver' in window)) {
@@ -674,23 +668,44 @@ function bindFx() {
 
 function bindParallax() {
   if (REDUCE) return;
-  const items = [[$('.about__img--b'), -0.12], [$('.about__img--a'), 0.05]];
-  let ticking = false;
-  const update = () => {
-    ticking = false;
-    items.forEach(([el, k]) => {
-      const r = el.getBoundingClientRect();
-      const mid = r.top + r.height / 2 - innerHeight / 2;
-      el.style.translate = `0 ${(mid * k).toFixed(1)}px`;
-    });
+  const k = matchMedia('(pointer: coarse)').matches ? 0.6 : 1;
+  const items = [
+    { el: $('.about__img--b'), f: -0.12 * k, y: 0 },
+    { el: $('.about__img--a'), f: 0.05 * k, y: 0 }
+  ];
+  const box = $('.about__media');
+  let visible = false;
+  let running = false;
+
+  const target = it => {
+    const r = it.el.getBoundingClientRect();
+    return (r.top - it.y + r.height / 2 - innerHeight / 2) * it.f;
   };
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      ticking = true;
-      requestAnimationFrame(update);
-    }
-  }, { passive: true });
-  update();
+
+  const frame = () => {
+    let moving = false;
+    items.forEach(it => {
+      const to = target(it);
+      it.y += (to - it.y) * 0.12;
+      if (Math.abs(to - it.y) > 0.05) moving = true;
+      else it.y = to;
+      it.el.style.transform = `translate3d(0, ${it.y.toFixed(2)}px, 0)`;
+    });
+    if (visible || moving) requestAnimationFrame(frame);
+    else running = false;
+  };
+
+  const start = () => {
+    if (running) return;
+    running = true;
+    requestAnimationFrame(frame);
+  };
+
+  new IntersectionObserver(([e]) => {
+    visible = e.isIntersecting;
+    if (visible) start();
+  }, { rootMargin: '200px 0px' }).observe(box);
+  window.addEventListener('scroll', () => { if (visible) start(); }, { passive: true });
 }
 
 function init() {
