@@ -157,23 +157,6 @@ function tween(to, dur = 520) {
   requestAnimationFrame(step);
 }
 
-function countUp(el) {
-  const to = parseFloat(el.dataset.count);
-  const dec = +(el.dataset.decimals || 0);
-  if (REDUCE) {
-    el.textContent = to.toFixed(dec);
-    return;
-  }
-  const start = performance.now();
-  const dur = 1400;
-  const step = now => {
-    const p = Math.min((now - start) / dur, 1);
-    el.textContent = (to * (1 - Math.pow(1 - p, 4))).toFixed(dec);
-    if (p < 1) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-}
-
 function renderStatus() {
   const { day, min } = warsawNow();
   const [open, close] = HOURS[day];
@@ -190,7 +173,7 @@ function renderStatus() {
   }
   el.classList.toggle('is-open', isOpen);
   $('span', el).textContent = text;
-  const navStatus = $('#navStatus');
+  const navStatus = $('#mmStatus');
   navStatus.textContent = text;
   navStatus.classList.toggle('is-open', isOpen);
 }
@@ -508,16 +491,21 @@ function bindEvents() {
   stage.addEventListener('focusout', startQuotes);
 
   const burger = $('#burger');
-  burger.addEventListener('click', () => {
-    const open = burger.getAttribute('aria-expanded') !== 'true';
+  const menu = $('#mmenu');
+  const meta = $('meta[name="theme-color"]');
+  const setMenu = open => {
     burger.setAttribute('aria-expanded', open);
     document.body.classList.toggle('menu-open', open);
+    menu.setAttribute('aria-hidden', !open);
+    menu.inert = !open;
+    meta.content = open ? '#10121a' : document.documentElement.dataset.theme === 'dark' ? '#0b0c0f' : '#15161a';
+  };
+  burger.addEventListener('click', () => setMenu(burger.getAttribute('aria-expanded') !== 'true'));
+  menu.addEventListener('click', e => {
+    if (e.target.closest('a')) setMenu(false);
   });
-
-  $('#nav').addEventListener('click', e => {
-    if (!e.target.closest('a')) return;
-    burger.setAttribute('aria-expanded', 'false');
-    document.body.classList.remove('menu-open');
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.body.classList.contains('menu-open')) setMenu(false);
   });
 }
 
@@ -552,7 +540,6 @@ function bindScroll() {
 function bindReveal() {
   const targets = $$('.section__head, .step, .bill, .about__media, .about__text, .reviews__score, .quotes, .visit__info, .visit__map, .founder');
   targets.forEach(el => el.classList.add('reveal'));
-  const counters = $$('[data-count]');
 
   if (REDUCE || !('IntersectionObserver' in window)) {
     targets.forEach(el => el.classList.add('is-in'));
@@ -564,13 +551,11 @@ function bindReveal() {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
       entry.target.classList.add('is-in');
-      if (entry.target.dataset.count) countUp(entry.target);
       io.unobserve(entry.target);
     });
   }, { rootMargin: '0px 0px -10% 0px' });
 
   targets.forEach(el => io.observe(el));
-  counters.forEach(el => io.observe(el));
   io.observe($('#opinie'));
 }
 
@@ -585,9 +570,10 @@ function setTheme(dark) {
 function bindTheme() {
   const btn = $('#themeBtn');
   const root = document.documentElement;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
   let busy = false;
 
-  const swap = dark => {
+  const instant = dark => {
     root.classList.add('theme-swap');
     setTheme(dark);
     requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('theme-swap')));
@@ -596,30 +582,40 @@ function bindTheme() {
   btn.addEventListener('click', () => {
     if (busy) return;
     const dark = root.dataset.theme !== 'dark';
-    if (REDUCE || document.body.classList.contains('menu-open')) {
-      swap(dark);
+    if (REDUCE) {
+      instant(dark);
       return;
     }
     busy = true;
-    const r = btn.getBoundingClientRect();
-    const x = r.left + r.width / 2;
-    const y = r.top + r.height / 2;
-    const end = Math.ceil(Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)));
-    const wipe = document.createElement('div');
-    wipe.className = 'wipe';
-    wipe.style.background = dark ? '#0b0c0f' : '#f4f5f7';
-    document.body.appendChild(wipe);
-    const grow = wipe.animate(
-      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
-      { duration: 520, easing: 'cubic-bezier(.65, 0, .35, 1)', fill: 'forwards' }
-    );
-    grow.finished.then(() => {
-      swap(dark);
-      return wipe.animate({ opacity: [1, 0] }, { duration: 280, easing: 'ease-out', fill: 'forwards' }).finished;
-    }).then(() => {
-      wipe.remove();
+
+    if (fine && document.startViewTransition) {
+      const r = btn.getBoundingClientRect();
+      const x = r.left + r.width / 2;
+      const y = r.top + r.height / 2;
+      const end = Math.ceil(Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)));
+      const tr = document.startViewTransition(() => {
+        root.classList.add('theme-swap');
+        setTheme(dark);
+      });
+      tr.ready.then(() => {
+        root.animate(
+          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
+          { duration: 650, easing: 'cubic-bezier(.65, 0, .35, 1)', pseudoElement: '::view-transition-new(root)' }
+        );
+      });
+      tr.finished.finally(() => {
+        root.classList.remove('theme-swap');
+        busy = false;
+      });
+      return;
+    }
+
+    root.classList.add('theme-fade');
+    setTheme(dark);
+    setTimeout(() => {
+      root.classList.remove('theme-fade');
       busy = false;
-    });
+    }, 650);
   });
 }
 
@@ -702,7 +698,7 @@ function init() {
   const nav = (navigator.language || 'pl').slice(0, 2);
   state.lang = I18N[saved] ? saved : I18N[nav] ? nav : 'pl';
 
-  ['#heroBooksy', '#billBook', '#dockBook', '#reviewsLink', '#navBook', '#navBooksy'].forEach(sel => {
+  ['#heroBooksy', '#billBook', '#dockBook', '#reviewsLink', '#mmBook', '#mmBooksy'].forEach(sel => {
     $(sel).href = BOOKSY;
   });
 
