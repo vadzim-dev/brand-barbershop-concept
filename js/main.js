@@ -594,7 +594,7 @@ function bindTheme() {
     }
     busy = true;
 
-    if (fine && document.startViewTransition) {
+    if (document.startViewTransition) {
       const r = btn.getBoundingClientRect();
       const x = r.left + r.width / 2;
       const y = r.top + r.height / 2;
@@ -606,7 +606,7 @@ function bindTheme() {
       tr.ready.then(() => {
         root.animate(
           { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
-          { duration: 650, easing: 'cubic-bezier(.65, 0, .35, 1)', pseudoElement: '::view-transition-new(root)' }
+          { duration: fine ? 650 : 750, easing: 'cubic-bezier(.65, 0, .35, 1)', pseudoElement: '::view-transition-new(root)' }
         );
       });
       tr.finished.finally(() => {
@@ -636,13 +636,16 @@ function runIntro(done) {
   }
   try { sessionStorage.setItem('brand.intro', '1'); } catch (e) {}
   document.body.classList.add('is-intro');
-  requestAnimationFrame(() => intro.classList.add('is-on'));
-  setTimeout(() => {
-    intro.classList.add('is-out');
-    document.body.classList.remove('is-intro');
-    done();
-  }, 1250);
-  setTimeout(() => intro.remove(), 2300);
+  const wait = document.fonts ? Promise.race([document.fonts.load('900 100px "Big Shoulders Display"'), new Promise(r => setTimeout(r, 700))]) : Promise.resolve();
+  wait.catch(() => {}).then(() => {
+    requestAnimationFrame(() => intro.classList.add('is-on'));
+    setTimeout(() => {
+      intro.classList.add('is-out');
+      document.body.classList.remove('is-intro');
+      done();
+    }, 1500);
+    setTimeout(() => intro.remove(), 2550);
+  });
 }
 
 
@@ -848,6 +851,20 @@ function bindFlight() {
     sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life, max: life, size: big ? 3 + Math.random() * 3 : 1.5 + Math.random() * 2.5, star: big || Math.random() < .25, ph: Math.random() * 6 });
   };
 
+  const TEXT = 'h1, h2, h3, h4, p, li, a, button, b, strong, small, span, em, label, address';
+  const touch = (x, y) => {
+    if (x < 0 || y < 0 || x > w || y > h) return;
+    const hit = document.elementFromPoint(x, y);
+    const t = hit && hit.closest(TEXT);
+    if (!t || t.classList.contains('is-touched') || t.classList.contains('is-lit')) return;
+    const text = t.textContent.trim();
+    if (!text || text.length > 260) return;
+    const cs = getComputedStyle(t);
+    if (cs.webkitTextFillColor === 'rgba(0, 0, 0, 0)' || cs.webkitTextFillColor === 'transparent') return;
+    t.classList.add('is-touched');
+    setTimeout(() => t.classList.remove('is-touched'), 1600);
+  };
+
   const stopAll = () => {
     cancelAnimationFrame(raf);
     raf = 0;
@@ -884,6 +901,7 @@ function bindFlight() {
       trail.push({ x, y });
       while (trail.length > 54) trail.shift();
       if (Math.random() < .8) spark(x, y, 1.1, 30 + Math.random() * 24);
+      if (++f.tick % 2) touch(x, y);
     } else if (!f.landed) {
       f.landed = now;
       for (let i = 0; i < 26; i++) spark(e.x, e.y, 4.6, 40 + Math.random() * 26, i < 6);
@@ -997,7 +1015,8 @@ function bindFlight() {
       dur: Math.min(1700, Math.max(1000, 900 + Math.abs(to - from) * .2)),
       amp: Math.min(140, Math.max(60, innerWidth * .2)),
       held: false,
-      landed: 0
+      landed: 0,
+      tick: 0
     };
     f.end = anchor(id, to, () => f.held);
     const e0 = f.end();
