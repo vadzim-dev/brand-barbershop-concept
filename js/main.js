@@ -367,6 +367,13 @@ function applyStatic() {
   $$('.langs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === state.lang));
 }
 
+function splitName() {
+  const b = $('.founder__label b');
+  const name = b.textContent.trim();
+  b.setAttribute('aria-label', name);
+  b.innerHTML = [...name].map((ch, i) => `<span aria-hidden="true" style="--i:${i}">${ch}</span>`).join('');
+}
+
 function splitTitle() {
   const title = $('.hero__title');
   const words = title.textContent.trim().split(/ +/);
@@ -467,6 +474,10 @@ function bindEvents() {
     const open = btn.getAttribute('aria-expanded') !== 'true';
     btn.setAttribute('aria-expanded', open);
     $('#zalozyciel').classList.toggle('is-open', open);
+    if (open) {
+      const r = $('.founder__plus').getBoundingClientRect();
+      fx.burst(r.left + r.width / 2, r.top + r.height / 2, 26);
+    }
     if (open && !REDUCE) {
       setTimeout(() => $('#founderPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 450);
     }
@@ -721,12 +732,14 @@ function glow(rgb) {
   const g = c.getContext('2d');
   const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
   grad.addColorStop(0, `rgba(${rgb}, 1)`);
-  grad.addColorStop(.3, `rgba(${rgb}, .5)`);
+  grad.addColorStop(.25, `rgba(${rgb}, .55)`);
   grad.addColorStop(1, `rgba(${rgb}, 0)`);
   g.fillStyle = grad;
   g.fillRect(0, 0, 64, 64);
   return c;
 }
+
+const fx = { burst: () => {} };
 
 function bindFlight() {
   if (REDUCE) return;
@@ -735,185 +748,272 @@ function bindFlight() {
   cv.setAttribute('aria-hidden', 'true');
   document.body.append(cv);
   const ctx = cv.getContext('2d');
-  const gold = glow('255, 196, 92');
-  const blue = glow('76, 108, 255');
-  const white = glow('255, 248, 230');
+  const gold = glow('255, 190, 64');
+  const hot = glow('255, 250, 232');
+  const amber = glow('236, 146, 8');
   const inOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
-  const out = p => 1 - Math.pow(1 - p, 3);
-  let cancel = null;
+  const ease = p => p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+  const trail = [];
+  const sparks = [];
+  let flight = null;
+  let raf = 0;
+  let last = 0;
+  let w = 0;
+  let h = 0;
+  let dark = false;
+
+  const size = () => {
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    w = innerWidth;
+    h = innerHeight;
+    cv.width = w * dpr;
+    cv.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
 
   const anchor = (id, goal, held) => {
     if (id === '#top') {
       const r = $('.logo').getBoundingClientRect();
       return () => ({ x: r.left + 18, y: r.top + r.height / 2 });
     }
-    const el = $(id);
-    const head = el.querySelector(LAND) || el;
+    const head = $(id).querySelector(LAND) || $(id);
     return () => {
       const r = head.getBoundingClientRect();
       const shift = held() ? 0 : scrollY - goal;
-      return { x: Math.max(18, r.left - 16), y: r.top + Math.min(r.height / 2, 26) + shift };
+      return { x: Math.max(22, r.left - 18), y: r.top + Math.min(r.height / 2, 26) + shift };
     };
   };
 
-  const star = (x, y, size, spin, dark) => {
+  const blend = () => {
     ctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
-    const g = dark ? gold : blue;
-    ctx.globalAlpha = dark ? .6 : .45;
-    ctx.drawImage(g, x - size * 4, y - size * 4, size * 8, size * 8);
-    ctx.globalAlpha = 1;
+  };
+
+  const streak = (x, y, len, thick, angle, alpha) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(dark ? hot : amber, -len, -thick, len * 2, thick * 2);
+    ctx.restore();
+  };
+
+  const sparkle = (x, y, r, now, alpha) => {
+    const tw = .82 + .18 * Math.sin(now / 31) * Math.sin(now / 53);
+    const spin = now / 900;
+    blend();
+    ctx.globalAlpha = alpha * (dark ? .75 : .5);
+    const g = r * 6 * tw;
+    ctx.drawImage(dark ? gold : amber, x - g, y - g, g * 2, g * 2);
+
+    const long = r * (3.4 + .9 * Math.sin(now / 47));
+    streak(x, y, long, r * .32, spin, alpha * .95);
+    streak(x, y, long * .9, r * .32, spin + Math.PI / 2, alpha * .95);
+    const short = r * (1.5 + .7 * Math.sin(now / 37 + 1.3));
+    streak(x, y, short, r * .22, spin + Math.PI / 4, alpha * .7);
+    streak(x, y, short, r * .22, spin - Math.PI / 4, alpha * .7);
+
     ctx.globalCompositeOperation = 'source-over';
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(spin);
+    const k = r * 1.15 * tw;
+    const c = k * .16;
     ctx.beginPath();
-    for (let i = 0; i < 8; i++) {
-      const r = i % 2 ? size * .26 : size;
-      const a = i * Math.PI / 4;
-      ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
-    }
-    ctx.closePath();
-    ctx.fillStyle = dark ? '#fff6dd' : '#f2a516';
+    ctx.moveTo(0, -k);
+    ctx.quadraticCurveTo(c, -c, k, 0);
+    ctx.quadraticCurveTo(c, c, 0, k);
+    ctx.quadraticCurveTo(-c, c, -k, 0);
+    ctx.quadraticCurveTo(-c, -c, 0, -k);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = dark ? '#fff3c4' : '#ffb81f';
     ctx.fill();
     if (!dark) {
-      ctx.lineWidth = 1.2;
-      ctx.strokeStyle = '#2341d6';
+      ctx.lineWidth = .9;
+      ctx.strokeStyle = '#c47a00';
       ctx.stroke();
     }
     ctx.restore();
+
+    blend();
+    ctx.globalAlpha = alpha;
+    const core = r * .9;
+    ctx.drawImage(hot, x - core, y - core, core * 2, core * 2);
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+  };
+
+  const spark = (x, y, speed, life, big) => {
+    const a = Math.random() * Math.PI * 2;
+    const v = speed * (.3 + Math.random() * .7);
+    sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life, max: life, size: big ? 3 + Math.random() * 3 : 1.5 + Math.random() * 2.5, star: big || Math.random() < .25, ph: Math.random() * 6 });
+  };
+
+  const stopAll = () => {
+    cancelAnimationFrame(raf);
+    raf = 0;
+    trail.length = 0;
+    sparks.length = 0;
+    ctx.clearRect(0, 0, w, h);
+    cv.classList.remove('is-on');
+  };
+
+  const step = f => {
+    const now = f.now;
+    const p = Math.min(1, (now - f.t0) / f.dur);
+    if (!f.held) window.scrollTo({ top: f.from + (f.to - f.from) * inOut(p), behavior: 'instant' });
+    const q = ease(p);
+    const e = f.end();
+    const dx = e.x - f.sx;
+    const dy = e.y - f.sy;
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = -dy / len;
+    const ny = dx / len;
+    const sway = f.amp * Math.sin(q * Math.PI * 3) * Math.sin(q * Math.PI);
+    const x = f.sx + dx * q + nx * sway;
+    const y = f.sy + dy * q + ny * sway;
+    f.x = x;
+    f.y = y;
+
+    if (p < 1) {
+      const prev = trail[trail.length - 1];
+      if (prev) {
+        const gap = Math.hypot(x - prev.x, y - prev.y);
+        const n = Math.min(8, Math.floor(gap / 5));
+        for (let i = 1; i <= n; i++) trail.push({ x: prev.x + (x - prev.x) * i / (n + 1), y: prev.y + (y - prev.y) * i / (n + 1) });
+      }
+      trail.push({ x, y });
+      while (trail.length > 54) trail.shift();
+      if (Math.random() < .8) spark(x, y, 1.1, 30 + Math.random() * 24);
+    } else if (!f.landed) {
+      f.landed = now;
+      for (let i = 0; i < 26; i++) spark(e.x, e.y, 4.6, 40 + Math.random() * 26, i < 6);
+      const head = f.id === '#top' ? $('.logo') : $(f.id).querySelector(LAND);
+      if (head) {
+        head.classList.remove('is-lit');
+        void head.offsetWidth;
+        head.classList.add('is-lit');
+        setTimeout(() => head.classList.remove('is-lit'), 1300);
+      }
+    }
+  };
+
+  const loop = now => {
+    const dt = Math.min(3, (now - last) / 16.67);
+    last = now;
+    if (flight) {
+      flight.now = now;
+      step(flight);
+      if (flight.landed) trail.splice(0, Math.ceil(dt * 4));
+    } else {
+      trail.splice(0, Math.ceil(dt * 4));
+    }
+
+    ctx.clearRect(0, 0, w, h);
+    blend();
+    const n = trail.length;
+    trail.forEach((pt, i) => {
+      const k = (i + 1) / n;
+      const s = 2 + 16 * k * k;
+      ctx.globalAlpha = k * k * (dark ? .7 : .45);
+      ctx.drawImage(dark ? gold : amber, pt.x - s, pt.y - s, s * 2, s * 2);
+      if (k > .6) {
+        const c = s * .45;
+        ctx.globalAlpha = (k - .6) * 2;
+        ctx.drawImage(hot, pt.x - c, pt.y - c, c * 2, c * 2);
+      }
+    });
+
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      const s = sparks[i];
+      s.life -= dt;
+      if (s.life <= 0) {
+        sparks.splice(i, 1);
+        continue;
+      }
+      s.vx *= Math.pow(.93, dt);
+      s.vy = s.vy * Math.pow(.93, dt) + .025 * dt;
+      s.x += s.vx * dt;
+      s.y += s.vy * dt;
+      const k = s.life / s.max;
+      const tw = .55 + .45 * Math.sin(now / 40 + s.ph);
+      const r = s.size * (.5 + k);
+      if (s.star) {
+        streak(s.x, s.y, r * 2.6, r * .3, s.ph, k * tw);
+        streak(s.x, s.y, r * 2.6, r * .3, s.ph + Math.PI / 2, k * tw);
+      }
+      ctx.globalAlpha = k * tw;
+      ctx.drawImage(dark ? gold : amber, s.x - r * 1.6, s.y - r * 1.6, r * 3.2, r * 3.2);
+      ctx.drawImage(hot, s.x - r * .6, s.y - r * .6, r * 1.2, r * 1.2);
+    }
+    ctx.globalAlpha = 1;
+
+    if (flight) {
+      const fade = flight.landed ? Math.max(0, 1 - (now - flight.landed) / 280) : 1;
+      if (fade > 0) {
+        const grow = flight.landed ? 1 + (1 - fade) * 1.2 : 1;
+        sparkle(flight.x, flight.y, 11 * grow, now, fade);
+      } else {
+        window.removeEventListener('wheel', flight.hold);
+        window.removeEventListener('touchstart', flight.hold);
+        flight = null;
+      }
+    }
+    ctx.globalCompositeOperation = 'source-over';
+
+    if (!flight && !trail.length && !sparks.length) {
+      stopAll();
+      return;
+    }
+    raf = requestAnimationFrame(loop);
+  };
+
+  const run = () => {
+    if (raf) return;
+    dark = document.documentElement.dataset.theme === 'dark';
+    size();
+    cv.classList.add('is-on');
+    last = performance.now();
+    raf = requestAnimationFrame(loop);
   };
 
   const fly = (id, sx, sy) => {
-    if (cancel) cancel();
-    const dark = document.documentElement.dataset.theme === 'dark';
-    const dpr = Math.min(2, devicePixelRatio || 1);
-    const w = innerWidth;
-    const h = innerHeight;
-    cv.width = w * dpr;
-    cv.height = h * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    cv.classList.add('is-on');
-
-    const max = document.documentElement.scrollHeight - h;
+    if (flight) {
+      window.removeEventListener('wheel', flight.hold);
+      window.removeEventListener('touchstart', flight.hold);
+    }
+    trail.length = 0;
     const from = scrollY;
+    const max = document.documentElement.scrollHeight - innerHeight;
     const to = id === '#top' ? 0 : Math.min(max, Math.max(0, pageTop($(id)) - 84));
-    const end = anchor(id, to, () => held);
-    const dur = Math.min(1400, Math.max(760, 620 + Math.abs(to - from) * .22));
-    const bend = (sx > w / 2 ? -1 : 1) * .32;
-    const trail = [];
-    const sparks = [];
-    const t0 = performance.now();
-    let last = t0;
-    let held = false;
-    let landed = 0;
-    let raf = 0;
-
-    const hold = () => { held = true; };
-    window.addEventListener('wheel', hold, { passive: true, once: true });
-    window.addEventListener('touchstart', hold, { passive: true, once: true });
-
-    const stop = () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('wheel', hold);
-      window.removeEventListener('touchstart', hold);
-      ctx.clearRect(0, 0, w, h);
-      cv.classList.remove('is-on');
-      cancel = null;
+    const f = {
+      id,
+      sx,
+      sy,
+      from,
+      to,
+      x: sx,
+      y: sy,
+      t0: performance.now(),
+      dur: Math.min(1700, Math.max(1000, 900 + Math.abs(to - from) * .2)),
+      amp: Math.min(140, Math.max(60, innerWidth * .2)),
+      held: false,
+      landed: 0
     };
-    cancel = stop;
+    f.end = anchor(id, to, () => f.held);
+    const e0 = f.end();
+    const nx = -(e0.y - sy) / (Math.hypot(e0.x - sx, e0.y - sy) || 1);
+    f.amp *= Math.sign((innerWidth / 2 - sx) * nx) || 1;
+    f.hold = () => { f.held = true; };
+    window.addEventListener('wheel', f.hold, { passive: true, once: true });
+    window.addEventListener('touchstart', f.hold, { passive: true, once: true });
+    flight = f;
+    for (let i = 0; i < 10; i++) spark(sx, sy, 2.6, 26 + Math.random() * 16);
+    run();
+  };
 
-    const spark = (x, y, speed, life) => {
-      const a = Math.random() * Math.PI * 2;
-      const v = speed * (.3 + Math.random() * .7);
-      sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life, max: life, size: 2 + Math.random() * 3, gold: Math.random() < .6 });
-    };
-
-    const frame = now => {
-      const dt = Math.min(3, (now - last) / 16.67);
-      last = now;
-      const p = Math.min(1, (now - t0) / dur);
-      if (!held) window.scrollTo({ top: from + (to - from) * inOut(p), behavior: 'instant' });
-
-      const q = out(p);
-      const e = end();
-      const dx = e.x - sx;
-      const dy = e.y - sy;
-      const cx = (sx + e.x) / 2 - dy * bend;
-      const cy = (sy + e.y) / 2 + dx * bend;
-      const x = (1 - q) * (1 - q) * sx + 2 * (1 - q) * q * cx + q * q * e.x;
-      const y = (1 - q) * (1 - q) * sy + 2 * (1 - q) * q * cy + q * q * e.y;
-
-      if (p < 1) {
-        const prev = trail[trail.length - 1];
-        if (prev) {
-          const gap = Math.hypot(x - prev.x, y - prev.y);
-          const n = Math.min(6, Math.floor(gap / 6));
-          for (let i = 1; i <= n; i++) trail.push({ x: prev.x + (x - prev.x) * i / (n + 1), y: prev.y + (y - prev.y) * i / (n + 1) });
-        }
-        trail.push({ x, y });
-        while (trail.length > 42) trail.shift();
-        if (Math.random() < .7) spark(x, y, 1.2, 34 + Math.random() * 20);
-      } else {
-        if (!landed) {
-          landed = now;
-          for (let i = 0; i < 22; i++) spark(e.x, e.y, 4.2, 40 + Math.random() * 24);
-          const head = id === '#top' ? $('.logo') : $(id).querySelector(LAND);
-          if (head) {
-            head.classList.remove('is-lit');
-            void head.offsetWidth;
-            head.classList.add('is-lit');
-            setTimeout(() => head.classList.remove('is-lit'), 1300);
-          }
-        }
-        trail.splice(0, Math.ceil(dt * 3));
-      }
-
-      ctx.clearRect(0, 0, w, h);
-      ctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
-      const len = trail.length;
-      trail.forEach((pt, i) => {
-        const k = (i + 1) / len;
-        const s = 4 + 22 * k * k;
-        ctx.globalAlpha = k * (dark ? .55 : .35);
-        ctx.drawImage(blue, pt.x - s, pt.y - s, s * 2, s * 2);
-        if (k > .55) {
-          ctx.globalAlpha = (k - .55) * (dark ? 1.2 : .9);
-          ctx.drawImage(gold, pt.x - s * .7, pt.y - s * .7, s * 1.4, s * 1.4);
-        }
-      });
-
-      for (let i = sparks.length - 1; i >= 0; i--) {
-        const s = sparks[i];
-        s.life -= dt;
-        if (s.life <= 0) { sparks.splice(i, 1); continue; }
-        s.vx *= Math.pow(.93, dt);
-        s.vy = s.vy * Math.pow(.93, dt) + .03 * dt;
-        s.x += s.vx * dt;
-        s.y += s.vy * dt;
-        const k = s.life / s.max;
-        const tw = .6 + .4 * Math.sin(now / 45 + i);
-        const r = s.size * (.4 + k);
-        ctx.globalAlpha = k * tw;
-        ctx.drawImage(s.gold ? gold : dark ? white : blue, s.x - r * 2, s.y - r * 2, r * 4, r * 4);
-      }
-      ctx.globalAlpha = 1;
-
-      const fade = landed ? Math.max(0, 1 - (now - landed) / 260) : 1;
-      if (fade > 0) {
-        const pulse = 1 + .12 * Math.sin(now / 70);
-        const grow = landed ? 1 + (1 - fade) * .8 : 1;
-        ctx.globalAlpha = fade;
-        star(x, y, 13 * pulse * grow, now / 260, dark);
-        ctx.globalAlpha = 1;
-      }
-
-      if (landed && !trail.length && !sparks.length && fade <= 0) {
-        stop();
-        return;
-      }
-      raf = requestAnimationFrame(frame);
-    };
-    raf = requestAnimationFrame(frame);
+  fx.burst = (x, y, count = 22) => {
+    for (let i = 0; i < count; i++) spark(x, y, 4, 36 + Math.random() * 26, i < count / 4);
+    run();
   };
 
   document.addEventListener('click', e => {
@@ -948,6 +1048,7 @@ function init() {
   bindFx();
   bindParallax();
   bindFlight();
+  splitName();
   setInterval(renderStatus, 60000);
   runIntro(() => requestAnimationFrame(() => document.body.classList.add('is-ready')));
 }
