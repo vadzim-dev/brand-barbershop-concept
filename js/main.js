@@ -1,5 +1,6 @@
 const BOOKSY = 'https://booksy.com/pl-pl/67599_brand-barbershop_barber-shop_3_warszawa';
 const REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const LAND = '.reviews__big, h2, .founder__label b';
 
 const BARBERS = [
   { id: 'any', tier: 'barber' },
@@ -708,6 +709,227 @@ function bindParallax() {
   window.addEventListener('scroll', () => { if (visible) start(); }, { passive: true });
 }
 
+function pageTop(el) {
+  let y = 0;
+  for (let n = el; n; n = n.offsetParent) y += n.offsetTop;
+  return y;
+}
+
+function glow(rgb) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grad.addColorStop(0, `rgba(${rgb}, 1)`);
+  grad.addColorStop(.3, `rgba(${rgb}, .5)`);
+  grad.addColorStop(1, `rgba(${rgb}, 0)`);
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 64, 64);
+  return c;
+}
+
+function bindFlight() {
+  if (REDUCE) return;
+  const cv = document.createElement('canvas');
+  cv.className = 'flight';
+  cv.setAttribute('aria-hidden', 'true');
+  document.body.append(cv);
+  const ctx = cv.getContext('2d');
+  const gold = glow('255, 196, 92');
+  const blue = glow('76, 108, 255');
+  const white = glow('255, 248, 230');
+  const inOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+  const out = p => 1 - Math.pow(1 - p, 3);
+  let cancel = null;
+
+  const anchor = (id, goal, held) => {
+    if (id === '#top') {
+      const r = $('.logo').getBoundingClientRect();
+      return () => ({ x: r.left + 18, y: r.top + r.height / 2 });
+    }
+    const el = $(id);
+    const head = el.querySelector(LAND) || el;
+    return () => {
+      const r = head.getBoundingClientRect();
+      const shift = held() ? 0 : scrollY - goal;
+      return { x: Math.max(18, r.left - 16), y: r.top + Math.min(r.height / 2, 26) + shift };
+    };
+  };
+
+  const star = (x, y, size, spin, dark) => {
+    ctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
+    const g = dark ? gold : blue;
+    ctx.globalAlpha = dark ? .6 : .45;
+    ctx.drawImage(g, x - size * 4, y - size * 4, size * 8, size * 8);
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(spin);
+    ctx.beginPath();
+    for (let i = 0; i < 8; i++) {
+      const r = i % 2 ? size * .26 : size;
+      const a = i * Math.PI / 4;
+      ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+    }
+    ctx.closePath();
+    ctx.fillStyle = dark ? '#fff6dd' : '#f2a516';
+    ctx.fill();
+    if (!dark) {
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = '#2341d6';
+      ctx.stroke();
+    }
+    ctx.restore();
+  };
+
+  const fly = (id, sx, sy) => {
+    if (cancel) cancel();
+    const dark = document.documentElement.dataset.theme === 'dark';
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    const w = innerWidth;
+    const h = innerHeight;
+    cv.width = w * dpr;
+    cv.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cv.classList.add('is-on');
+
+    const max = document.documentElement.scrollHeight - h;
+    const from = scrollY;
+    const to = id === '#top' ? 0 : Math.min(max, Math.max(0, pageTop($(id)) - 84));
+    const end = anchor(id, to, () => held);
+    const dur = Math.min(1400, Math.max(760, 620 + Math.abs(to - from) * .22));
+    const bend = (sx > w / 2 ? -1 : 1) * .32;
+    const trail = [];
+    const sparks = [];
+    const t0 = performance.now();
+    let last = t0;
+    let held = false;
+    let landed = 0;
+    let raf = 0;
+
+    const hold = () => { held = true; };
+    window.addEventListener('wheel', hold, { passive: true, once: true });
+    window.addEventListener('touchstart', hold, { passive: true, once: true });
+
+    const stop = () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('wheel', hold);
+      window.removeEventListener('touchstart', hold);
+      ctx.clearRect(0, 0, w, h);
+      cv.classList.remove('is-on');
+      cancel = null;
+    };
+    cancel = stop;
+
+    const spark = (x, y, speed, life) => {
+      const a = Math.random() * Math.PI * 2;
+      const v = speed * (.3 + Math.random() * .7);
+      sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life, max: life, size: 2 + Math.random() * 3, gold: Math.random() < .6 });
+    };
+
+    const frame = now => {
+      const dt = Math.min(3, (now - last) / 16.67);
+      last = now;
+      const p = Math.min(1, (now - t0) / dur);
+      if (!held) window.scrollTo({ top: from + (to - from) * inOut(p), behavior: 'instant' });
+
+      const q = out(p);
+      const e = end();
+      const dx = e.x - sx;
+      const dy = e.y - sy;
+      const cx = (sx + e.x) / 2 - dy * bend;
+      const cy = (sy + e.y) / 2 + dx * bend;
+      const x = (1 - q) * (1 - q) * sx + 2 * (1 - q) * q * cx + q * q * e.x;
+      const y = (1 - q) * (1 - q) * sy + 2 * (1 - q) * q * cy + q * q * e.y;
+
+      if (p < 1) {
+        const prev = trail[trail.length - 1];
+        if (prev) {
+          const gap = Math.hypot(x - prev.x, y - prev.y);
+          const n = Math.min(6, Math.floor(gap / 6));
+          for (let i = 1; i <= n; i++) trail.push({ x: prev.x + (x - prev.x) * i / (n + 1), y: prev.y + (y - prev.y) * i / (n + 1) });
+        }
+        trail.push({ x, y });
+        while (trail.length > 42) trail.shift();
+        if (Math.random() < .7) spark(x, y, 1.2, 34 + Math.random() * 20);
+      } else {
+        if (!landed) {
+          landed = now;
+          for (let i = 0; i < 22; i++) spark(e.x, e.y, 4.2, 40 + Math.random() * 24);
+          const head = id === '#top' ? $('.logo') : $(id).querySelector(LAND);
+          if (head) {
+            head.classList.remove('is-lit');
+            void head.offsetWidth;
+            head.classList.add('is-lit');
+            setTimeout(() => head.classList.remove('is-lit'), 1300);
+          }
+        }
+        trail.splice(0, Math.ceil(dt * 3));
+      }
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
+      const len = trail.length;
+      trail.forEach((pt, i) => {
+        const k = (i + 1) / len;
+        const s = 4 + 22 * k * k;
+        ctx.globalAlpha = k * (dark ? .55 : .35);
+        ctx.drawImage(blue, pt.x - s, pt.y - s, s * 2, s * 2);
+        if (k > .55) {
+          ctx.globalAlpha = (k - .55) * (dark ? 1.2 : .9);
+          ctx.drawImage(gold, pt.x - s * .7, pt.y - s * .7, s * 1.4, s * 1.4);
+        }
+      });
+
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i];
+        s.life -= dt;
+        if (s.life <= 0) { sparks.splice(i, 1); continue; }
+        s.vx *= Math.pow(.93, dt);
+        s.vy = s.vy * Math.pow(.93, dt) + .03 * dt;
+        s.x += s.vx * dt;
+        s.y += s.vy * dt;
+        const k = s.life / s.max;
+        const tw = .6 + .4 * Math.sin(now / 45 + i);
+        const r = s.size * (.4 + k);
+        ctx.globalAlpha = k * tw;
+        ctx.drawImage(s.gold ? gold : dark ? white : blue, s.x - r * 2, s.y - r * 2, r * 4, r * 4);
+      }
+      ctx.globalAlpha = 1;
+
+      const fade = landed ? Math.max(0, 1 - (now - landed) / 260) : 1;
+      if (fade > 0) {
+        const pulse = 1 + .12 * Math.sin(now / 70);
+        const grow = landed ? 1 + (1 - fade) * .8 : 1;
+        ctx.globalAlpha = fade;
+        star(x, y, 13 * pulse * grow, now / 260, dark);
+        ctx.globalAlpha = 1;
+      }
+
+      if (landed && !trail.length && !sparks.length && fade <= 0) {
+        stop();
+        return;
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+  };
+
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a || a.classList.contains('skip') || e.defaultPrevented) return;
+    const id = a.getAttribute('href');
+    if (id.length < 2 || (id !== '#top' && !$(id))) return;
+    e.preventDefault();
+    const r = a.getBoundingClientRect();
+    const x = e.clientX || r.left + 24;
+    const y = e.clientY || r.top + r.height / 2;
+    history.replaceState(null, '', id === '#top' ? location.pathname : id);
+    requestAnimationFrame(() => fly(id, x, y));
+  });
+}
+
 function init() {
   const saved = store('brand.lang');
   const nav = (navigator.language || 'pl').slice(0, 2);
@@ -725,6 +947,7 @@ function init() {
   bindTheme();
   bindFx();
   bindParallax();
+  bindFlight();
   setInterval(renderStatus, 60000);
   runIntro(() => requestAnimationFrame(() => document.body.classList.add('is-ready')));
 }
