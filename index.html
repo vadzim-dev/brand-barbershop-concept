@@ -32,10 +32,36 @@
       </a>
 
       <nav class="nav" id="nav" aria-label="Menu">
-        <a href="#cennik" data-i18n="nav.prices">Cennik</a>
-        <a href="#zalozyciel" data-i18n="nav.founder">Założyciel</a>
-        <a href="#opinie" data-i18n="nav.reviews">Opinie</a>
-        <a href="#kontakt" data-i18n="nav.visit">Dojazd</a>
+        <div class="nav__links">
+          <a href="#cennik" style="--i:0"><span data-i18n="nav.prices">Cennik</span><svg class="nav__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+          <a href="#zalozyciel" style="--i:1"><span data-i18n="nav.founder">Założyciel</span><svg class="nav__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+          <a href="#opinie" style="--i:2"><span data-i18n="nav.reviews">Opinie</span><svg class="nav__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+          <a href="#kontakt" style="--i:3"><span data-i18n="nav.visit">Dojazd</span><svg class="nav__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+        </div>
+        <div class="nav__extra">
+          <p class="nav__status" id="navStatus"></p>
+          <a class="btn btn--accent btn--block" id="navBook" href="#" target="_blank" rel="noopener" data-i18n="ui.booksy">Rezerwuj na Booksy</a>
+          <div class="nav__social">
+            <a href="https://www.instagram.com/barbershop_brand/" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.8l1.4-2h4.6l1.4 2h1.8A2.5 2.5 0 0 1 20 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5Z"/><circle cx="12" cy="13" r="3.6"/></svg>
+              <span>Instagram</span>
+            </a>
+            <a id="navBooksy" href="#" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4M9 15l2 2 4-4"/></svg>
+              <span>Booksy</span>
+            </a>
+            <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Aleje+Jerozolimskie+55,+00-697+Warszawa" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
+              <span data-i18n="menu.map">Mapa</span>
+            </a>
+            <a href="tel:+48729499301">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.5h2.6l1.5 4-2 1.3a11 11 0 0 0 6.5 6.5l1.3-2 4 1.5v2.6a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2Z"/></svg>
+              <span data-i18n="menu.call">Zadzwoń</span>
+            </a>
+          </div>
+          <p class="nav__addr">Al. Jerozolimskie 55, Warszawa</p>
+          <img class="nav__mark" src="assets/wordmark.svg" alt="" aria-hidden="true">
+        </div>
       </nav>
 
       <div class="topbar__tools">
