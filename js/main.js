@@ -190,6 +190,9 @@ function renderStatus() {
   }
   el.classList.toggle('is-open', isOpen);
   $('span', el).textContent = text;
+  const navStatus = $('#navStatus');
+  navStatus.textContent = text;
+  navStatus.classList.toggle('is-open', isOpen);
 }
 
 function renderTicker() {
@@ -581,22 +584,41 @@ function setTheme(dark) {
 
 function bindTheme() {
   const btn = $('#themeBtn');
+  const root = document.documentElement;
+  let busy = false;
+
+  const swap = dark => {
+    root.classList.add('theme-swap');
+    setTheme(dark);
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('theme-swap')));
+  };
+
   btn.addEventListener('click', () => {
-    const dark = document.documentElement.dataset.theme !== 'dark';
-    if (REDUCE || !document.startViewTransition) {
-      setTheme(dark);
+    if (busy) return;
+    const dark = root.dataset.theme !== 'dark';
+    if (REDUCE || document.body.classList.contains('menu-open')) {
+      swap(dark);
       return;
     }
+    busy = true;
     const r = btn.getBoundingClientRect();
     const x = r.left + r.width / 2;
     const y = r.top + r.height / 2;
-    const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-    const tr = document.startViewTransition(() => setTheme(dark));
-    tr.ready.then(() => {
-      document.documentElement.animate(
-        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
-        { duration: 750, easing: 'cubic-bezier(.65, 0, .35, 1)', pseudoElement: '::view-transition-new(root)' }
-      );
+    const end = Math.ceil(Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)));
+    const wipe = document.createElement('div');
+    wipe.className = 'wipe';
+    wipe.style.background = dark ? '#0b0c0f' : '#f4f5f7';
+    document.body.appendChild(wipe);
+    const grow = wipe.animate(
+      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
+      { duration: 520, easing: 'cubic-bezier(.65, 0, .35, 1)', fill: 'forwards' }
+    );
+    grow.finished.then(() => {
+      swap(dark);
+      return wipe.animate({ opacity: [1, 0] }, { duration: 280, easing: 'ease-out', fill: 'forwards' }).finished;
+    }).then(() => {
+      wipe.remove();
+      busy = false;
     });
   });
 }
@@ -680,7 +702,7 @@ function init() {
   const nav = (navigator.language || 'pl').slice(0, 2);
   state.lang = I18N[saved] ? saved : I18N[nav] ? nav : 'pl';
 
-  ['#heroBooksy', '#billBook', '#dockBook', '#reviewsLink'].forEach(sel => {
+  ['#heroBooksy', '#billBook', '#dockBook', '#reviewsLink', '#navBook', '#navBooksy'].forEach(sel => {
     $(sel).href = BOOKSY;
   });
 
