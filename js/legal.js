@@ -1,7 +1,8 @@
 const TITLES = {
   pl: 'Polityka prywatności · BRAND Barbershop',
   en: 'Privacy policy · BRAND Barbershop',
-  ru: 'Политика конфиденциальности · BRAND Barbershop'
+  ru: 'Политика конфиденциальности · BRAND Barbershop',
+  tr: 'Gizlilik politikası · BRAND Barbershop'
 };
 
 function savedLang() {
