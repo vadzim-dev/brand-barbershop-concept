@@ -1,25 +1,24 @@
-# BRAND Barbershop — website concept
+# BRAND Barbershop
 
-A one-page website concept for BRAND Barbershop, Al. Jerozolimskie 55, Warsaw.
-This is not the salon's official website; bookings stay on Booksy.
+Website for BRAND Barbershop, Al. Jerozolimskie 55, Warsaw.
 
-**Live:** https://vadzim-dev.github.io/brand-barbershop-concept/
+## Features
 
-## What's inside
-
-- Price calculator in two steps: pick a barber, tick services, see the total and time
-- Hint when two services are cheaper as a COMBO
+- Price calculator: pick a barber, tick services, see the total and visit length
+- Hint when two services are cheaper together as a COMBO
 - Founder section with an expandable story
-- Rotating real 5-star reviews from Booksy
-- Live "open now" status in Warsaw time and today's hours highlighted
-- Scroll details: progress bar, scissors divider, animated barber poles, count-up numbers
-- Three languages: Polish, English, Russian
-- Responsive layout with a sticky booking bar on mobile, respects reduced motion
+- Rotating 5-star reviews from Booksy
+- Live "open now" status in Warsaw time, today's hours highlighted
+- Light and dark theme, three languages: Polish, English, Russian
+- Google Map that loads only after the visitor clicks
+- Privacy policy page, no cookies, no third-party requests on page load
+- Respects reduced motion settings
 
 ## Stack
 
-Plain HTML, CSS and JavaScript. No build step, no backend.
+Plain HTML, CSS and JavaScript. No build step, no backend. Fonts and photos are self-hosted in `assets/`.
 
-Photos: [Unsplash](https://unsplash.com) and BRAND Barbershop. Prices, hours and reviews from the salon's public Booksy profile (November 2026).
+## Before going live
 
-Design and code: [Vadzim](https://github.com/vadzim-dev)
+- Remove `<meta name="robots" content="noindex, nofollow">` from both HTML files
+- Add the company's legal name and NIP to the privacy policy

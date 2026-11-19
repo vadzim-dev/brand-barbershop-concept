@@ -8,11 +8,9 @@
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#15161a">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://images.unsplash.com">
-  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Familjen+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=14">
+  <link rel="preload" href="assets/fonts/big-shoulders-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/familjen-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/style.css?v=15">
   <script>try{if(localStorage.getItem('brand.theme')==='dark')document.documentElement.dataset.theme='dark'}catch(e){}</script>
 </head>
 <body>
@@ -114,7 +112,7 @@
       </div>
 
       <figure class="hero__media">
-        <img src="https://images.unsplash.com/photo-1647140655214-e4a2d914971f?w=1100&q=80&auto=format&fit=crop" alt="" data-i18n-alt="hero.alt" width="1100" height="1375" fetchpriority="high">
+        <img src="assets/hero.webp" alt="" data-i18n-alt="hero.alt" width="1100" height="1375" fetchpriority="high">
         <div class="stamp" aria-hidden="true">
           <svg class="stamp__ring" viewBox="0 0 200 200">
             <defs><path id="ring" d="M100 100m-74 0a74 74 0 1 1 148 0a74 74 0 1 1-148 0"/></defs>
@@ -185,11 +183,10 @@
       <span class="cut__line cut__line--r"></span>
     </div>
 
-
     <section class="section about" id="o-nas">
       <div class="about__media">
-        <img class="about__img about__img--a" src="https://images.unsplash.com/photo-1648221122323-572c13a31663?w=1000&q=85&auto=format&fit=crop" alt="" data-i18n-alt="about.altCut" loading="lazy" width="900" height="1100">
-        <img class="about__img about__img--b" src="https://images.unsplash.com/photo-1517832606299-7ae9b720a186?w=700&q=80&auto=format&fit=crop" alt="" data-i18n-alt="about.altBeard" loading="lazy" width="700" height="800">
+        <img class="about__img about__img--a" src="assets/about-cut.webp" alt="" data-i18n-alt="about.altCut" loading="lazy" width="900" height="1100">
+        <img class="about__img about__img--b" src="assets/about-beard.webp" alt="" data-i18n-alt="about.altBeard" loading="lazy" width="700" height="800">
       </div>
       <div class="about__text">
         <h2 class="h2" data-i18n="about.title">Strzyżenie to dopiero połowa</h2>
@@ -262,8 +259,13 @@
         <h3 class="h3" data-i18n="visit.hours">Godziny otwarcia</h3>
         <table class="hours" id="hours"></table>
       </div>
-      <div class="visit__map">
-        <iframe title="Mapa: Al. Jerozolimskie 55, Warszawa" src="https://www.google.com/maps?q=Aleje+Jerozolimskie+55,+00-697+Warszawa&amp;z=16&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div class="visit__map" id="map">
+        <div class="map-gate">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>
+          <b>Al. Jerozolimskie 55</b>
+          <p data-i18n="visit.mapNote">Mapa Google wczyta się po kliknięciu. Google otrzyma wtedy Twój adres IP.</p>
+          <button class="btn btn--dark" type="button" id="mapBtn" data-i18n="visit.mapShow">Pokaż mapę</button>
+        </div>
       </div>
     </section>
   </main>
@@ -271,11 +273,16 @@
   <footer class="footer">
     <div class="footer__inner">
       <img class="footer__logo" src="assets/wordmark.svg" alt="BRAND Barber Shop" width="150" height="46">
-      <p class="footer__concept" data-i18n="footer.concept">Koncepcja strony przygotowana dla BRAND Barbershop. To nie jest oficjalna strona salonu, rezerwacje przyjmuje Booksy.</p>
-      <p class="footer__credits">
-        <span><span data-i18n="footer.made">Projekt i kod:</span> <a href="https://github.com/vadzim-dev" target="_blank" rel="noopener">Vadzim</a></span>
-        <span><span data-i18n="footer.photos">Zdjęcia:</span> <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>, BRAND Barbershop</span>
-      </p>
+      <div class="footer__info">
+        <p>Al. Jerozolimskie 55, 00-697 Warszawa</p>
+        <p><a href="tel:+48729499301">+48 729 499 301</a></p>
+      </div>
+      <div class="footer__links">
+        <a href="https://www.instagram.com/barbershop_brand/" target="_blank" rel="noopener">Instagram</a>
+        <a id="footBooksy" href="#" target="_blank" rel="noopener">Booksy</a>
+        <a href="polityka-prywatnosci.html" data-i18n="footer.privacy">Polityka prywatności</a>
+      </div>
+      <p class="footer__copy">© 2026 BRAND Barbershop</p>
     </div>
   </footer>
 
@@ -287,7 +294,7 @@
     <a class="btn btn--accent btn--sm" id="dockBook" href="#" target="_blank" rel="noopener" tabindex="-1" data-i18n="dock.book">Rezerwuj</a>
   </div>
 
-  <script src="js/i18n.js?v=14"></script>
-  <script src="js/main.js?v=14"></script>
+  <script src="js/i18n.js?v=15"></script>
+  <script src="js/main.js?v=15"></script>
 </body>
 </html>
