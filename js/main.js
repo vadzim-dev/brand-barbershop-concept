@@ -1,6 +1,7 @@
 const BOOKSY = 'https://booksy.com/pl-pl/67599_brand-barbershop_barber-shop_3_warszawa';
 const REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const LAND = '.reviews__big, h2, .founder__label b';
+const MAP = 'https://www.google.com/maps?q=Aleje+Jerozolimskie+55,+00-697+Warszawa&z=16&output=embed';
 
 const BARBERS = [
   { id: 'any', tier: 'barber' },
@@ -483,6 +484,10 @@ function bindEvents() {
     }
   });
 
+  $('#mapBtn').addEventListener('click', () => {
+    $('#map').innerHTML = `<iframe title="${t('visit.mapTitle')}" src="${MAP}" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+  });
+
   $('#founderBook').addEventListener('click', () => {
     setBarber('Karim');
     if (!state.picked.size) toggleService('cut', true);
@@ -606,7 +611,7 @@ function bindTheme() {
       tr.ready.then(() => {
         root.animate(
           { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
-          { duration: fine ? 650 : 750, easing: 'cubic-bezier(.65, 0, .35, 1)', pseudoElement: '::view-transition-new(root)' }
+          { duration: fine ? 650 : 750, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', pseudoElement: '::view-transition-new(root)' }
         );
       });
       tr.finished.finally(() => {
@@ -636,8 +641,9 @@ function runIntro(done) {
   }
   try { sessionStorage.setItem('brand.intro', '1'); } catch (e) {}
   document.body.classList.add('is-intro');
-  const wait = document.fonts ? Promise.race([document.fonts.load('900 100px "Big Shoulders Display"'), new Promise(r => setTimeout(r, 700))]) : Promise.resolve();
-  wait.catch(() => {}).then(() => {
+  const font = document.fonts ? document.fonts.load('900 100px "Big Shoulders Display"') : Promise.resolve();
+  const timeout = new Promise(resolve => setTimeout(resolve, 700));
+  Promise.race([font, timeout]).catch(() => {}).then(() => {
     requestAnimationFrame(() => intro.classList.add('is-on'));
     setTimeout(() => {
       intro.classList.add('is-out');
@@ -647,7 +653,6 @@ function runIntro(done) {
     setTimeout(() => intro.remove(), 2550);
   });
 }
-
 
 function bindFx() {
   if (REDUCE || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
@@ -723,6 +728,22 @@ function bindParallax() {
   window.addEventListener('scroll', () => { if (visible) start(); }, { passive: true });
 }
 
+function light(el) {
+  if (!el) return;
+  const clipped = getComputedStyle(el).webkitTextFillColor === 'rgba(0, 0, 0, 0)';
+  const name = clipped || el.tagName !== 'H2' ? 'is-glow' : 'is-glint';
+  el.style.setProperty('--c', getComputedStyle(el).color);
+  el.classList.remove('is-glow', 'is-glint');
+  void el.offsetWidth;
+  el.classList.add(name);
+  el.addEventListener('animationend', function end(e) {
+    if (e.target !== el) return;
+    el.classList.remove(name);
+    el.style.removeProperty('--c');
+    el.removeEventListener('animationend', end);
+  });
+}
+
 function pageTop(el) {
   let y = 0;
   for (let n = el; n; n = n.offsetParent) y += n.offsetTop;
@@ -735,7 +756,7 @@ function glow(rgb) {
   const g = c.getContext('2d');
   const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
   grad.addColorStop(0, `rgba(${rgb}, 1)`);
-  grad.addColorStop(.25, `rgba(${rgb}, .55)`);
+  grad.addColorStop(0.25, `rgba(${rgb}, 0.55)`);
   grad.addColorStop(1, `rgba(${rgb}, 0)`);
   g.fillStyle = grad;
   g.fillRect(0, 0, 64, 64);
@@ -754,8 +775,8 @@ function bindFlight() {
   const gold = glow('255, 190, 64');
   const hot = glow('255, 250, 232');
   const amber = glow('236, 146, 8');
-  const inOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
-  const ease = p => p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+  const inOut = p => p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+  const ease = p => p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
   const trail = [];
   const sparks = [];
   let flight = null;
@@ -801,26 +822,26 @@ function bindFlight() {
   };
 
   const sparkle = (x, y, r, now, alpha) => {
-    const tw = .82 + .18 * Math.sin(now / 31) * Math.sin(now / 53);
+    const tw = 0.82 + 0.18 * Math.sin(now / 31) * Math.sin(now / 53);
     const spin = now / 900;
     blend();
-    ctx.globalAlpha = alpha * (dark ? .75 : .5);
+    ctx.globalAlpha = alpha * (dark ? 0.75 : 0.5);
     const g = r * 6 * tw;
     ctx.drawImage(dark ? gold : amber, x - g, y - g, g * 2, g * 2);
 
-    const long = r * (3.4 + .9 * Math.sin(now / 47));
-    streak(x, y, long, r * .32, spin, alpha * .95);
-    streak(x, y, long * .9, r * .32, spin + Math.PI / 2, alpha * .95);
-    const short = r * (1.5 + .7 * Math.sin(now / 37 + 1.3));
-    streak(x, y, short, r * .22, spin + Math.PI / 4, alpha * .7);
-    streak(x, y, short, r * .22, spin - Math.PI / 4, alpha * .7);
+    const long = r * (3.4 + 0.9 * Math.sin(now / 47));
+    streak(x, y, long, r * 0.32, spin, alpha * 0.95);
+    streak(x, y, long * 0.9, r * 0.32, spin + Math.PI / 2, alpha * 0.95);
+    const short = r * (1.5 + 0.7 * Math.sin(now / 37 + 1.3));
+    streak(x, y, short, r * 0.22, spin + Math.PI / 4, alpha * 0.7);
+    streak(x, y, short, r * 0.22, spin - Math.PI / 4, alpha * 0.7);
 
     ctx.globalCompositeOperation = 'source-over';
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(spin);
     const k = r * 1.15 * tw;
-    const c = k * .16;
+    const c = k * 0.16;
     ctx.beginPath();
     ctx.moveTo(0, -k);
     ctx.quadraticCurveTo(c, -c, k, 0);
@@ -831,7 +852,7 @@ function bindFlight() {
     ctx.fillStyle = dark ? '#fff3c4' : '#ffb81f';
     ctx.fill();
     if (!dark) {
-      ctx.lineWidth = .9;
+      ctx.lineWidth = 0.9;
       ctx.strokeStyle = '#c47a00';
       ctx.stroke();
     }
@@ -839,7 +860,7 @@ function bindFlight() {
 
     blend();
     ctx.globalAlpha = alpha;
-    const core = r * .9;
+    const core = r * 0.9;
     ctx.drawImage(hot, x - core, y - core, core * 2, core * 2);
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
@@ -847,22 +868,18 @@ function bindFlight() {
 
   const spark = (x, y, speed, life, big) => {
     const a = Math.random() * Math.PI * 2;
-    const v = speed * (.3 + Math.random() * .7);
-    sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life, max: life, size: big ? 3 + Math.random() * 3 : 1.5 + Math.random() * 2.5, star: big || Math.random() < .25, ph: Math.random() * 6 });
-  };
-
-  const TEXT = 'h1, h2, h3, h4, p, li, a, button, b, strong, small, span, em, label, address';
-  const touch = (x, y) => {
-    if (x < 0 || y < 0 || x > w || y > h) return;
-    const hit = document.elementFromPoint(x, y);
-    const t = hit && hit.closest(TEXT);
-    if (!t || t.classList.contains('is-touched') || t.classList.contains('is-lit')) return;
-    const text = t.textContent.trim();
-    if (!text || text.length > 260) return;
-    const cs = getComputedStyle(t);
-    if (cs.webkitTextFillColor === 'rgba(0, 0, 0, 0)' || cs.webkitTextFillColor === 'transparent') return;
-    t.classList.add('is-touched');
-    setTimeout(() => t.classList.remove('is-touched'), 1600);
+    const v = speed * (0.3 + Math.random() * 0.7);
+    sparks.push({
+      x,
+      y,
+      vx: Math.cos(a) * v,
+      vy: Math.sin(a) * v,
+      life,
+      max: life,
+      size: big ? 3 + Math.random() * 3 : 1.5 + Math.random() * 2.5,
+      star: big || Math.random() < 0.25,
+      ph: Math.random() * 6
+    });
   };
 
   const stopAll = () => {
@@ -896,22 +913,18 @@ function bindFlight() {
       if (prev) {
         const gap = Math.hypot(x - prev.x, y - prev.y);
         const n = Math.min(8, Math.floor(gap / 5));
-        for (let i = 1; i <= n; i++) trail.push({ x: prev.x + (x - prev.x) * i / (n + 1), y: prev.y + (y - prev.y) * i / (n + 1) });
+        for (let i = 1; i <= n; i++) {
+          const k = i / (n + 1);
+          trail.push({ x: prev.x + (x - prev.x) * k, y: prev.y + (y - prev.y) * k });
+        }
       }
       trail.push({ x, y });
       while (trail.length > 54) trail.shift();
-      if (Math.random() < .8) spark(x, y, 1.1, 30 + Math.random() * 24);
-      if (++f.tick % 2) touch(x, y);
+      if (Math.random() < 0.8) spark(x, y, 1.1, 30 + Math.random() * 24);
     } else if (!f.landed) {
       f.landed = now;
       for (let i = 0; i < 26; i++) spark(e.x, e.y, 4.6, 40 + Math.random() * 26, i < 6);
-      const head = f.id === '#top' ? $('.logo') : $(f.id).querySelector(LAND);
-      if (head) {
-        head.classList.remove('is-lit');
-        void head.offsetWidth;
-        head.classList.add('is-lit');
-        setTimeout(() => head.classList.remove('is-lit'), 1300);
-      }
+      if (f.id !== '#top') light($(f.id).querySelector(LAND));
     }
   };
 
@@ -932,11 +945,11 @@ function bindFlight() {
     trail.forEach((pt, i) => {
       const k = (i + 1) / n;
       const s = 2 + 16 * k * k;
-      ctx.globalAlpha = k * k * (dark ? .7 : .45);
+      ctx.globalAlpha = k * k * (dark ? 0.7 : 0.45);
       ctx.drawImage(dark ? gold : amber, pt.x - s, pt.y - s, s * 2, s * 2);
-      if (k > .6) {
-        const c = s * .45;
-        ctx.globalAlpha = (k - .6) * 2;
+      if (k > 0.6) {
+        const c = s * 0.45;
+        ctx.globalAlpha = (k - 0.6) * 2;
         ctx.drawImage(hot, pt.x - c, pt.y - c, c * 2, c * 2);
       }
     });
@@ -948,20 +961,20 @@ function bindFlight() {
         sparks.splice(i, 1);
         continue;
       }
-      s.vx *= Math.pow(.93, dt);
-      s.vy = s.vy * Math.pow(.93, dt) + .025 * dt;
+      s.vx *= Math.pow(0.93, dt);
+      s.vy = s.vy * Math.pow(0.93, dt) + 0.025 * dt;
       s.x += s.vx * dt;
       s.y += s.vy * dt;
       const k = s.life / s.max;
-      const tw = .55 + .45 * Math.sin(now / 40 + s.ph);
-      const r = s.size * (.5 + k);
+      const tw = 0.55 + 0.45 * Math.sin(now / 40 + s.ph);
+      const r = s.size * (0.5 + k);
       if (s.star) {
-        streak(s.x, s.y, r * 2.6, r * .3, s.ph, k * tw);
-        streak(s.x, s.y, r * 2.6, r * .3, s.ph + Math.PI / 2, k * tw);
+        streak(s.x, s.y, r * 2.6, r * 0.3, s.ph, k * tw);
+        streak(s.x, s.y, r * 2.6, r * 0.3, s.ph + Math.PI / 2, k * tw);
       }
       ctx.globalAlpha = k * tw;
       ctx.drawImage(dark ? gold : amber, s.x - r * 1.6, s.y - r * 1.6, r * 3.2, r * 3.2);
-      ctx.drawImage(hot, s.x - r * .6, s.y - r * .6, r * 1.2, r * 1.2);
+      ctx.drawImage(hot, s.x - r * 0.6, s.y - r * 0.6, r * 1.2, r * 1.2);
     }
     ctx.globalAlpha = 1;
 
@@ -1012,11 +1025,10 @@ function bindFlight() {
       x: sx,
       y: sy,
       t0: performance.now(),
-      dur: Math.min(1700, Math.max(1000, 900 + Math.abs(to - from) * .2)),
-      amp: Math.min(140, Math.max(60, innerWidth * .2)),
+      dur: Math.min(1700, Math.max(1000, 900 + Math.abs(to - from) * 0.2)),
+      amp: Math.min(140, Math.max(60, innerWidth * 0.2)),
       held: false,
-      landed: 0,
-      tick: 0
+      landed: 0
     };
     f.end = anchor(id, to, () => f.held);
     const e0 = f.end();
@@ -1054,7 +1066,7 @@ function init() {
   const nav = (navigator.language || 'pl').slice(0, 2);
   state.lang = I18N[saved] ? saved : I18N[nav] ? nav : 'pl';
 
-  ['#heroBooksy', '#billBook', '#dockBook', '#reviewsLink', '#mmBook', '#mmBooksy'].forEach(sel => {
+  ['#heroBooksy', '#billBook', '#dockBook', '#reviewsLink', '#mmBook', '#mmBooksy', '#footBooksy'].forEach(sel => {
     $(sel).href = BOOKSY;
   });
 

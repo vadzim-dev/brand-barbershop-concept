@@ -92,10 +92,11 @@ const I18N = {
     'visit.route': 'Wyznacz trasę',
     'visit.hours': 'Godziny otwarcia',
     'visit.today': 'dziś',
+    'visit.mapNote': 'Mapa Google wczyta się po kliknięciu. Google otrzyma wtedy Twój adres IP.',
+    'visit.mapShow': 'Pokaż mapę',
+    'visit.mapTitle': 'Mapa: Al. Jerozolimskie 55, Warszawa',
     'days': ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'],
-    'footer.concept': 'Koncepcja strony przygotowana dla BRAND Barbershop. To nie jest oficjalna strona salonu, rezerwacje przyjmuje Booksy.',
-    'footer.made': 'Projekt i kod:',
-    'footer.photos': 'Zdjęcia:',
+    'footer.privacy': 'Polityka prywatności',
     'dock.book': 'Rezerwuj'
   },
 
@@ -192,10 +193,11 @@ const I18N = {
     'visit.route': 'Get directions',
     'visit.hours': 'Opening hours',
     'visit.today': 'today',
+    'visit.mapNote': 'The Google map loads after you click. Google will then receive your IP address.',
+    'visit.mapShow': 'Show map',
+    'visit.mapTitle': 'Map: Al. Jerozolimskie 55, Warsaw',
     'days': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-    'footer.concept': 'A website concept made for BRAND Barbershop. This is not the salon’s official website; bookings go through Booksy.',
-    'footer.made': 'Design and code:',
-    'footer.photos': 'Photos:',
+    'footer.privacy': 'Privacy policy',
     'dock.book': 'Book'
   },
 
@@ -292,10 +294,11 @@ const I18N = {
     'visit.route': 'Построить маршрут',
     'visit.hours': 'Часы работы',
     'visit.today': 'сегодня',
+    'visit.mapNote': 'Карта Google загрузится после нажатия. Тогда Google получит ваш IP-адрес.',
+    'visit.mapShow': 'Показать карту',
+    'visit.mapTitle': 'Карта: Al. Jerozolimskie 55, Варшава',
     'days': ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'],
-    'footer.concept': 'Концепт сайта, подготовленный для BRAND Barbershop. Это не официальный сайт салона, запись принимает Booksy.',
-    'footer.made': 'Дизайн и код:',
-    'footer.photos': 'Фото:',
+    'footer.privacy': 'Политика конфиденциальности',
     'dock.book': 'Записаться'
   }
 };
