@@ -178,7 +178,7 @@ button {
   white-space: nowrap;
   overflow: hidden;
   isolation: isolate;
-  transition: transform .25s var(--spring), border-color .25s, color .25s, translate .45s var(--ease);
+  transition: border-color .25s, color .25s;
 }
 
 .btn::after {
@@ -193,14 +193,6 @@ button {
 
 .btn:hover::after {
   transform: none;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-}
-
-.btn:active {
-  transform: scale(.97);
 }
 
 .btn--sm {
@@ -1149,10 +1141,6 @@ button {
   opacity: 1;
 }
 
-.founder__btn:active {
-  transform: scale(.985);
-}
-
 .founder__label {
   display: grid;
 }
@@ -1279,10 +1267,6 @@ button {
 }
 
 .founder__plus::after {
-  transform: rotate(90deg);
-}
-
-.founder__btn:hover .founder__plus {
   transform: rotate(90deg);
 }
 
