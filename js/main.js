@@ -656,16 +656,6 @@ function runIntro(done) {
 function bindFx() {
   if (REDUCE || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
-  $$('.btn, .theme, .founder__plus').forEach(el => {
-    el.addEventListener('pointermove', e => {
-      const r = el.getBoundingClientRect();
-      const dx = e.clientX - (r.left + r.width / 2);
-      const dy = e.clientY - (r.top + r.height / 2);
-      el.style.translate = `${dx * 0.22}px ${dy * 0.32}px`;
-    });
-    el.addEventListener('pointerleave', () => { el.style.translate = ''; });
-  });
-
   document.addEventListener('pointermove', e => {
     const card = e.target.closest('.svc, .barber, .perks li, .quote, .bill');
     if (!card) return;
