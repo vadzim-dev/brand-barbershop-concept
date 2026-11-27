@@ -6,20 +6,19 @@ const MAP = 'https://www.google.com/maps?q=Aleje+Jerozolimskie+55,+00-697+Warsza
 const BARBERS = [
   { id: 'any', tier: 'barber' },
   { id: 'Roman', tier: 'barber' },
-  { id: 'Andrzej', tier: 'barber' },
+  { id: 'Andrzej', tier: 'top' },
   { id: 'Darina', tier: 'top' },
-  { id: 'Karim', tier: 'top', photo: 'assets/karim.webp' },
+  { id: 'Karim', tier: 'karim', photo: 'assets/karim.webp' },
   { id: 'Zahar', tier: 'master' }
 ];
 
 const SERVICES = [
-  { id: 'cut', main: true, price: { barber: 120, top: 140, master: 140 }, time: { barber: 45, top: 60, master: 60 } },
-  { id: 'combo', main: true, price: { barber: 180, top: 200, master: 245 }, time: { barber: 75, top: 75, master: 60 } },
-  { id: 'beard', main: true, price: { barber: 80, top: 100, master: 125 }, time: { barber: 30, top: 30, master: 30 } },
+  { id: 'cut', main: true, price: { barber: 120, top: 140, karim: 160, master: 140 }, time: { barber: 45, top: 60, karim: 60, master: 60 } },
+  { id: 'combo', main: true, price: { barber: 180, top: 200, karim: 230, master: 245 }, time: { barber: 75, top: 75, karim: 75, master: 60 } },
+  { id: 'beard', main: true, price: { barber: 80, top: 100, karim: 100, master: 125 }, time: { barber: 30, top: 30, karim: 30, master: 30 } },
   { id: 'clipper', main: true, price: 100, time: 45 },
   { id: 'clipperBeard', price: 150, time: 60 },
   { id: 'kid', price: 100, time: 45 },
-  { id: 'fatherSon', price: 190, time: 75 },
   { id: 'greyHair', price: 80, time: 30 },
   { id: 'greyBeard', price: 80, time: 30 },
   { id: 'greyCombo', price: 150, time: 45 },
@@ -42,7 +41,7 @@ const HOURS = [
   ['10:00', '20:00']
 ];
 
-const RATINGS = [[5, 1065], [4, 7], [3, 6], [2, 4], [1, 4]];
+const RATINGS = [[5, 1083], [4, 7], [3, 6], [2, 4], [1, 4]];
 
 const REVIEWS = [
   { name: 'Adam', staff: 'Karim', text: 'Najlepszy barber, u jakiego byłem. Brodę zawsze strzyże bardzo dokładnie i zgodnie z tym, o co proszę.' },
